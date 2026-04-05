@@ -1,0 +1,25 @@
+[project]
+name = "nlppp"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+
+
+dependencies = [
+    "pydantic>=2.0", 
+]
+
+[project.optional-dependencies]
+discovery = [
+    "acl-anthology>=1.1.0",
+    "requests",
+    "beautifulsoup4",
+    "semanticscholar",
+]
+
+ingest = [
+    "docling",
+]
+
+full = ["nlppp[discovery, ingest]"]
