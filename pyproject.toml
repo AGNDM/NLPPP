@@ -19,7 +19,9 @@ discovery = [
 ]
 
 ingest = [
-    "docling",
+    # "docling", # Chunky requires GPU but maybe
+    # "grobid-client-python>=0.1.4", No Good
+    "pymupdf4llm",
 ]
 
 full = ["nlppp[discovery, ingest]"]
