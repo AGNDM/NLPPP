@@ -11,6 +11,8 @@ class PaperMetadata(BaseModel):
     Populated during metadata fetch and treated as immutable thereafter.
     """
     anthology_id: str
+    arxiv_id: Optional[str] = None 
+    """arxiv_id obtained from Semantic Scholar."""
     title: str
     authors: List[str]
     abstract: Optional[str] = None
