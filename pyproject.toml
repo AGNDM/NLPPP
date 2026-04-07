@@ -31,6 +31,7 @@ discovery = [
 ingest = [
     "datasets>=4.8.4",
     "huggingface-hub>=1.9.0",
+    "pandas>=3.0.2",
     # "docling", # Chunky requires GPU but maybe
     # "grobid-client-python>=0.1.4", No Good
     "pymupdf4llm",
