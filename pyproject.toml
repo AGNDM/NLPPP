@@ -30,6 +30,7 @@ discovery = [
 
 ingest = [
     "datasets>=4.8.4",
+    "duckdb>=1.5.1",
     "huggingface-hub>=1.9.0",
     "pandas>=3.0.2",
     # "docling", # Chunky requires GPU but maybe
