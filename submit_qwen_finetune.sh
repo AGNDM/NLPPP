@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=qwen05b-qasper-ft
 #SBATCH --account=a131
-#SBATCH --time=08:00:00
+#SBATCH --time=03:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --gpus-per-node=4
@@ -12,9 +12,7 @@
 set -euo pipefail
 
 # Run from this script's directory (repo root)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-mkdir -p log
+cd /iopsstor/scratch/cscs/tong/share/xianrong_liu/tutorial_NLPPP
 
 # Optional: override these with exported env vars before sbatch
 : "${UENV_IMAGE:=pytorch/v2.8.0:v1}"
