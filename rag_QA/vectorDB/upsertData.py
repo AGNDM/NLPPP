@@ -2,11 +2,6 @@ import json
 import time
 import os
 import uuid
-from dotenv import load_dotenv
-import torch
-from transformers import AutoTokenizer
-from adapters import AutoAdapterModel
-from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
 from helpers import load_embedding_model, embed, get_qdrant_client

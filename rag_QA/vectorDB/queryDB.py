@@ -1,10 +1,4 @@
 import os
-from dotenv import load_dotenv
-import torch
-from transformers import AutoTokenizer
-from adapters import AutoAdapterModel
-from qdrant_client import QdrantClient
-
 from helpers import QDRANT_API_KEY, load_embedding_model, embed, get_qdrant_client, query_vector_db
 
 COLLECTION_NAME = "nlp_papers"
