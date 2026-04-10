@@ -21,6 +21,7 @@ class QASPERExample(BaseModel):
     answer_type: Optional[Literal["extractive", "free_form", "yes_no"]] = None
     
     raw_answer: str
+    abstract: str
     evidence: list[str]
     has_float_evidence: bool
     is_unanswerable: bool
@@ -29,6 +30,26 @@ class QASPERExample(BaseModel):
     annotators_agree_answersability: bool
     split: Literal["train", "validation", "test"]
 
+    nlp_background: Optional[str] = None
+    topic_background: Optional[str] = None
+    paper_read: Optional[bool] = None
+    search_query: Optional[str] = None
+
+
+class QASData(BaseModel):
+    question_id: str
+    question_text: str
+    
+    # None when is_unanswerable is True
+    answer_type: Optional[Literal["extractive", "free_form", "yes_no"]] = None
+
+    raw_answer: str
+    evidence: list[str]
+    has_float_evidence: bool
+    is_unanswerable: bool
+    is_cleanable: bool
+    annotator_count: int
+    annotators_agree_answersability: bool
 
     nlp_background: Optional[str] = None
     topic_background: Optional[str] = None
