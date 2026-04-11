@@ -116,8 +116,7 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=True)
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name,
-        torch_dtype=torch.bfloat16,
-        device_map="auto",
+        dtype=torch.bfloat16,
     )
 
     # Load and tokenize dataset
