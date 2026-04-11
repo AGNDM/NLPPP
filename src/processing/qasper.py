@@ -22,6 +22,7 @@ def to_processed(raw: QASPERExample) -> Optional[ProcessedExample]:
     
     return ProcessedExample(
         question=raw.question_text,
+        abstract=raw.abstract,
         context="\n\n".join(raw.evidence),
         answer = raw.raw_answer,
         source=raw.qasper_id  # ArXiv ID

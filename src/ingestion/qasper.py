@@ -1,4 +1,4 @@
-from models import QASPERExample
+from models import QASPERExample, QASData
 from datasets import load_dataset, Dataset
 import pandas as pd
 from dotenv import load_dotenv
@@ -21,12 +21,23 @@ def process_split(split: Dataset, split_key: str) -> list[QASPERExample]:
 
 
 def process_row(row: dict, split_key: str) -> list[QASPERExample]:
-    id = row["id"]
+    paper_id = row["id"]
+    abstract = row["abstract"]
     column = row["qas"]
-    return process_qas_column(column, split_key, id)
+    qas_items = process_qas_column(column)
+
+    return [
+        QASPERExample(
+            qasper_id=paper_id,
+            abstract=abstract,
+            split=split_key,
+            **qas.model_dump()
+        )
+        for qas in qas_items
+    ]
 
 
-def process_qas_column(column: dict, split_key: str, qasper_id: str) -> list[QASPERExample]:
+def process_qas_column(column: dict) -> list[QASData]:
     examples = []
     for i, question_id in enumerate(column["question_id"]):
         question_text = column["question"][i]
@@ -36,11 +47,9 @@ def process_qas_column(column: dict, split_key: str, qasper_id: str) -> list[QAS
         paper_read = bool(paper_read) if paper_read != "" else None
         search_query = column["search_query"][i]
         examples.append(
-            QASPERExample(
-                qasper_id=qasper_id,
+            QASData(
                 question_id=question_id,
                 question_text=question_text,
-                split=split_key,
                 nlp_background=nlp_background,
                 topic_background=topic_background,
                 paper_read=paper_read,
@@ -110,12 +119,14 @@ def process_answer(answers: dict) -> dict:
 
 
 def create_raw_qasper_splits(
+        qasper_dir: Path,
         hf_path: str ="allenai/qasper",
         hf_revision: str="refs/pr/6"   #required to bypass deprecated data script
+
     ):
 
-    _ = load_dotenv()
-    qasper_raw_dir = Path(os.environ["QASPER_DIR"]) / "raw"
+    
+    qasper_raw_dir =  qasper_dir / "raw"
     qasper_raw_dir.mkdir(parents=True, exist_ok=True)
 
     ds = load_dataset(hf_path, revision=hf_revision)
@@ -129,4 +140,5 @@ def create_raw_qasper_splits(
 
 
 if __name__ == "__main__":
-    create_raw_qasper_splits()
+    _ = load_dotenv()
+    create_raw_qasper_splits(qasper_dir=Path(os.environ["QASPER_DIR"]))
