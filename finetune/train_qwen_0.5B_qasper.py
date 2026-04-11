@@ -140,6 +140,7 @@ def main():
         learning_rate=args.learning_rate,
         fp16=False,
         bf16=True,
+        ddp_find_unused_parameters=False,
         logging_steps=50,
         save_steps=500,
         save_total_limit=2,
@@ -168,10 +169,13 @@ def main():
     model.eval()
     generated_texts = []
     for i, prompt in enumerate(sample_prompts):
-        input_ids = tokenizer.encode(prompt, return_tensors="pt").to(model.device)
+        inputs = tokenizer(prompt, return_tensors="pt")
+        input_ids = inputs["input_ids"].to(model.device)
+        attention_mask = inputs["attention_mask"].to(model.device)
         with torch.no_grad():
             output_ids = model.generate(
                 input_ids,
+                attention_mask=attention_mask,
                 max_new_tokens=200,
                 do_sample=True,
                 temperature=0.7,
