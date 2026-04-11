@@ -9,6 +9,7 @@
 """
 
 import argparse
+import json
 import os
 from pathlib import Path
 
@@ -21,7 +22,7 @@ from transformers import (
     AutoModelForCausalLM,
     Trainer,
     TrainingArguments,
-    DataCollatorForLanguageModeling,
+    DataCollatorForSeq2Seq,
 )
 
 
@@ -95,18 +96,67 @@ def load_dataset(data_path: str) -> Dataset:
     # Expect columns `prompt` and `response`
     if not {"prompt", "response"}.issubset(df.columns):
         raise ValueError("Parquet file must contain 'prompt' and 'response' columns")
-    # Combine prompt and response into a single text for causal LM training
-    df["text"] = df["prompt"].astype(str) + "\n" + df["response"].astype(str)
-    return Dataset.from_pandas(df[["text"]])
+    df["prompt"] = df["prompt"].astype(str)
+    df["response"] = df["response"].astype(str)
+    return Dataset.from_pandas(df[["prompt", "response"]])
 
 
 def tokenize_function(examples, tokenizer, max_len):
-    return tokenizer(
-        examples["text"],
-        truncation=True,
-        max_length=max_len,
-        padding="max_length",
-    )
+    input_ids_batch = []
+    attention_mask_batch = []
+    labels_batch = []
+
+    pad_token_id = tokenizer.pad_token_id
+    eos_token_id = tokenizer.eos_token_id
+
+    if pad_token_id is None:
+        raise ValueError("Tokenizer must have a pad_token_id")
+    if eos_token_id is None:
+        raise ValueError("Tokenizer must have an eos_token_id")
+
+    for prompt, response in zip(examples["prompt"], examples["response"]):
+        prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"]
+        response_ids = tokenizer(response, add_special_tokens=False)["input_ids"]
+
+        # Keep supervision tokens even when sequence is long:
+        # truncate response first, then keep as much prompt as fits.
+        response_ids = response_ids[: max_len - 1]
+        max_prompt_len = max_len - len(response_ids) - 1
+        prompt_ids = prompt_ids[: max(0, max_prompt_len)]
+
+        full_ids = prompt_ids + response_ids + [eos_token_id]
+        full_labels = ([-100] * len(prompt_ids)) + response_ids + [eos_token_id]
+        attention_mask = [1] * len(full_ids)
+
+        input_ids_batch.append(full_ids)
+        attention_mask_batch.append(attention_mask)
+        labels_batch.append(full_labels)
+
+    return {
+        "input_ids": input_ids_batch,
+        "attention_mask": attention_mask_batch,
+        "labels": labels_batch,
+    }
+
+
+def extract_first_valid_json(text: str):
+    start = text.find("{")
+    while start != -1:
+        depth = 0
+        for idx in range(start, len(text)):
+            char = text[idx]
+            if char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+                if depth == 0:
+                    candidate = text[start: idx + 1]
+                    try:
+                        return json.loads(candidate)
+                    except json.JSONDecodeError:
+                        break
+        start = text.find("{", start + 1)
+    return None
 
 
 def main():
@@ -132,12 +182,14 @@ def main():
         tokenized_dataset = raw_dataset.map(
             lambda x: tokenize_function(x, tokenizer, args.max_seq_length),
             batched=True,
-            remove_columns=["text"],
+            remove_columns=["prompt", "response"],
         )
 
-        # Data collator for causal LM (labels are inputs shifted)
-        data_collator = DataCollatorForLanguageModeling(
-            tokenizer=tokenizer, mlm=False
+        data_collator = DataCollatorForSeq2Seq(
+            tokenizer=tokenizer,
+            padding=True,
+            label_pad_token_id=-100,
+            return_tensors="pt",
         )
 
         training_args = TrainingArguments(
@@ -159,7 +211,7 @@ def main():
             model=model,
             args=training_args,
             train_dataset=tokenized_dataset,
-            tokenizer=tokenizer,
+            processing_class=tokenizer,
             data_collator=data_collator,
         )
 
@@ -187,10 +239,8 @@ def main():
                     output_ids = model.generate(
                         input_ids,
                         attention_mask=attention_mask,
-                        max_new_tokens=1000,
-                        do_sample=True,
-                        temperature=0.7,
-                        top_p=0.9,
+                        max_new_tokens=256,
+                        do_sample=False,
                         eos_token_id=tokenizer.eos_token_id,
                         pad_token_id=tokenizer.eos_token_id,
                     )
@@ -211,7 +261,22 @@ def main():
                     gen_text = tokenizer.decode(
                         fallback_continuation_ids, skip_special_tokens=True
                     ).strip()
-                generated_texts.append(f"--- Sample {i+1} ---\nPrompt: {prompt}\nGenerated: {gen_text}\n")
+
+                parsed = extract_first_valid_json(gen_text)
+                if parsed is None:
+                    parsed = {
+                        "answerability": "unanswerable",
+                        "evidence": [],
+                        "answer": "unanswerable",
+                    }
+
+                normalized = {
+                    "answerability": parsed.get("answerability", "unanswerable"),
+                    "evidence": parsed.get("evidence", []),
+                    "answer": parsed.get("answer", "unanswerable"),
+                }
+                final_json = json.dumps(normalized, ensure_ascii=False)
+                generated_texts.append(f"--- Sample {i+1} ---\nPrompt: {prompt}\nGenerated: {final_json}\n")
 
             samples_path = Path(args.samples_output)
             samples_path.write_text("\n".join(generated_texts))
