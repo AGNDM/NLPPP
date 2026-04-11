@@ -65,7 +65,7 @@ def get_qdrant_client():
 
 # ── Query VectorDB ─────────────────────────────────────────────────────────
 
-def query_vector_db(client, query_embedding, collection_name="nlp_papers",top_k=3):
+def query_vector_db(client, query_embedding, collection_name="nlp_papers",top_k=3, with_vectors: bool = False):
     """Query the vector database for similar papers.
     
     Args:
@@ -82,5 +82,6 @@ def query_vector_db(client, query_embedding, collection_name="nlp_papers",top_k=
         query=query_embedding.tolist(),
         limit=top_k,
         with_payload=True,  # Include paper metadata
+        with_vectors=with_vectors
     ).points
     return results
