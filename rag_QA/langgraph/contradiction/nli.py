@@ -76,7 +76,8 @@ def detect_contradictions(results: list[ScoredPoint], nli_model_name: str) -> li
 
 
 if __name__ == "__main__":
-    #model_name =  cross-encoder/nli-deberta-v3-large
+    # model_name =  "cross-encoder/nli-deberta-v3-large"
+    # model_name = "cross-encoder/nli-deberta-v3-small"
     model_name = "cross-encoder/nli-MiniLM2-L6-H768"
 
     abstract_a = "In this work we analyze the role of attention weights in Transformer-based models. Our experiments on BERT demonstrate that attention weights are strongly correlated with token importance and are therefore reliable indicators of model reasoning. We show that removing high-attention tokens leads to a significant drop in performance of 23.4 F1 on SQuAD, confirming that attention weights provide a faithful explanation of model behaviour."
