@@ -118,6 +118,12 @@ def main():
         args.model_name,
         dtype=torch.bfloat16,
     )
+    model.config.pad_token_id = tokenizer.pad_token_id
+    model.generation_config.pad_token_id = tokenizer.pad_token_id
+    model.config.bos_token_id = tokenizer.bos_token_id
+    model.generation_config.bos_token_id = tokenizer.bos_token_id
+    model.config.eos_token_id = tokenizer.eos_token_id
+    model.generation_config.eos_token_id = tokenizer.eos_token_id
 
     # Load and tokenize dataset
     raw_dataset = load_dataset(args.data_path)
@@ -176,7 +182,7 @@ def main():
             output_ids = model.generate(
                 input_ids,
                 attention_mask=attention_mask,
-                max_new_tokens=200,
+                max_new_tokens=1000,
                 do_sample=True,
                 temperature=0.7,
                 top_p=0.9,
