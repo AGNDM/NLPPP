@@ -241,7 +241,7 @@ def main() -> None:
 		save_strategy="steps",
 		bf16=True,
 		fp16=False,
-		gradient_checkpointing=True,
+		gradient_checkpointing=False,
 		report_to="none",
 		seed=args.seed,
 		ddp_find_unused_parameters=False,
