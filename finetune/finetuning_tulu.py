@@ -213,6 +213,19 @@ def main() -> None:
 		bias="none",
 	)
 	model = get_peft_model(model, lora_config)
+	if hasattr(model, "enable_input_require_grads"):
+		model.enable_input_require_grads()
+	else:
+		def _set_require_grad(_module, _input, output):
+			output.requires_grad_(True)
+		model.get_input_embeddings().register_forward_hook(_set_require_grad)
+
+	trainable_param_count = sum(param.numel() for param in model.parameters() if param.requires_grad)
+	if trainable_param_count == 0:
+		raise RuntimeError(
+			"No trainable parameters found after applying LoRA. "
+			"Please verify --lora_target_modules matches your model architecture."
+		)
 	model.print_trainable_parameters()
 
 	training_args = TrainingArguments(
