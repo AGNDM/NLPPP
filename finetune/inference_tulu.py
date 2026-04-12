@@ -166,18 +166,33 @@ def _load_model_and_tokenizer(args: argparse.Namespace):
         torch_dtype = torch.float32
         device = torch.device("cpu")
 
-    model_source = checkpoint_dir # if (checkpoint_dir / "config.json").exists() else args.model_name
-    load_kwargs: Dict[str, Any] = {"torch_dtype": torch_dtype}
+    adapter_config = checkpoint_dir / "adapter_config.json"
+    model_source = args.model_name if adapter_config.exists() else checkpoint_dir
+
+    if adapter_config.exists():
+        print(
+            f"Detected LoRA adapter checkpoint at {checkpoint_dir}. "
+            f"Loading base model '{args.model_name}' and applying adapter weights from the checkpoint."
+        )
+    else:
+        print(
+            f"No adapter_config.json found in {checkpoint_dir}. "
+            "Loading model weights directly from the checkpoint directory."
+        )
+
+    load_kwargs: Dict[str, Any] = {"dtype": torch_dtype}
     if torch.cuda.is_available() and _has_accelerate():
         load_kwargs["device_map"] = "auto"
 
     model = AutoModelForCausalLM.from_pretrained(str(model_source), **load_kwargs)
 
-    adapter_config = checkpoint_dir / "adapter_config.json"
     if adapter_config.exists():
         if PeftModel is None:
             raise RuntimeError("Missing dependency: peft. Install with `pip install peft`.")
         model = PeftModel.from_pretrained(model, str(checkpoint_dir))
+        print("Confirmed: running the finetuned LoRA model, not the base model.")
+    else:
+        print("Warning: checkpoint does not look like a LoRA adapter checkpoint.")
 
     if not torch.cuda.is_available() or "device_map" not in load_kwargs:
         model = model.to(device)
