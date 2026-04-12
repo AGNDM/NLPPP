@@ -1,10 +1,10 @@
 import os
 import torch
+import numpy as np
 from dotenv import load_dotenv
 from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, VectorParams, PointStruct
 
 load_dotenv()
 
@@ -13,7 +13,7 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 # ── Load embedding model ──────────────────────────────────────────────────────
 
-def load_embedding_model():
+def load_embedding_model() -> tuple[AutoTokenizer, AutoAdapterModel]:
     """Load the SPECTER 2 model and tokenizer, and return them for reuse.
 
     Returns:
@@ -30,7 +30,7 @@ def load_embedding_model():
 
 # ── Embedding helper ──────────────────────────────────────────────────────────
 
-def embed(texts, tokenizer, model):
+def embed(texts: list[str], tokenizer: AutoTokenizer, model: AutoAdapterModel) -> np.ndarray:
     """Convert a list(!) of texts to SPECTER 2 embeddings.
 
     Args:
@@ -57,7 +57,7 @@ def embed(texts, tokenizer, model):
 
 # ── Connect to Qdrant ─────────────────────────────────────────────────────────
 
-def get_qdrant_client():
+def get_qdrant_client() -> QdrantClient:
     print("Connecting to Qdrant...")
     client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
     print("  → Connected\n")
@@ -65,7 +65,8 @@ def get_qdrant_client():
 
 # ── Query VectorDB ─────────────────────────────────────────────────────────
 
-def query_vector_db(client, query_embedding, collection_name="nlp_papers",top_k=3, with_vectors: bool = False):
+
+def query_vector_db(client: QdrantClient, query_embedding: np.ndarray, collection_name: str = "nlp_papers", top_k: int = 3, with_vectors: bool = False) -> list:
     """Query the vector database for similar papers.
     
     Args:
