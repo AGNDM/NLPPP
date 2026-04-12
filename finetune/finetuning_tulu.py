@@ -142,8 +142,15 @@ def _render_chat_text(messages: List[Dict[str, str]], tokenizer: AutoTokenizer) 
 	return "".join(parts)
 
 
+def _render_turn_text(role: str, content: str) -> str:
+	role = str(role).strip().lower()
+	if role not in {"system", "user", "assistant"}:
+		role = "user"
+	return f"<|start_header_id|>{role}<|end_header_id|>\n\n{content.strip()}<|eot_id|>"
+
+
 def build_text_dataset(raw_dataset: Dataset, tokenizer: AutoTokenizer) -> Dataset:
-	rows: List[Dict[str, str]] = []
+	rows: List[Dict[str, Any]] = []
 	for record in raw_dataset:
 		messages = _to_messages(record)
 		if not messages:
@@ -151,7 +158,7 @@ def build_text_dataset(raw_dataset: Dataset, tokenizer: AutoTokenizer) -> Datase
 
 		text = _render_chat_text(messages, tokenizer)
 		if text:
-			rows.append({"text": text})
+			rows.append({"messages": messages, "text": text})
 
 	if not rows:
 		raise ValueError("No trainable examples found in the provided dataset")
@@ -159,14 +166,48 @@ def build_text_dataset(raw_dataset: Dataset, tokenizer: AutoTokenizer) -> Datase
 	return Dataset.from_list(rows)
 
 
-def tokenize_function(examples: Dict[str, List[str]], tokenizer: AutoTokenizer, max_length: int) -> Dict[str, Any]:
-	tokenized = tokenizer(
-		examples["text"],
-		truncation=True,
-		max_length=max_length,
-		padding=False,
-	)
-	return tokenized
+def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, max_length: int) -> Dict[str, Any]:
+	input_ids_batch: List[List[int]] = []
+	attention_mask_batch: List[List[int]] = []
+	labels_batch: List[List[int]] = []
+
+	bos_token_ids = tokenizer("<|begin_of_text|>", add_special_tokens=False)["input_ids"]
+	if not bos_token_ids:
+		bos_token_ids = []
+
+	for messages in examples["messages"]:
+		full_ids: List[int] = list(bos_token_ids)
+		full_labels: List[int] = [-100] * len(bos_token_ids)
+
+		for turn in messages:
+			if not isinstance(turn, dict):
+				continue
+			role = _normalize_role(turn.get("role", turn.get("from", "user")))
+			content = str(turn.get("content", turn.get("value", turn.get("text", "")))).strip()
+			if not content:
+				continue
+
+			segment_text = _render_turn_text(role, content)
+			segment_ids = tokenizer(segment_text, add_special_tokens=False)["input_ids"]
+			full_ids.extend(segment_ids)
+			if role == "assistant":
+				full_labels.extend(segment_ids)
+			else:
+				full_labels.extend([-100] * len(segment_ids))
+
+		full_ids = full_ids[:max_length]
+		full_labels = full_labels[:max_length]
+		attention_mask = [1] * len(full_ids)
+
+		input_ids_batch.append(full_ids)
+		attention_mask_batch.append(attention_mask)
+		labels_batch.append(full_labels)
+
+	return {
+		"input_ids": input_ids_batch,
+		"attention_mask": attention_mask_batch,
+		"labels": labels_batch,
+	}
 
 
 def main() -> None:
@@ -193,7 +234,7 @@ def main() -> None:
 	tokenized_dataset = text_dataset.map(
 		lambda batch: tokenize_function(batch, tokenizer, args.max_seq_length),
 		batched=True,
-		remove_columns=["text"],
+		remove_columns=["messages", "text"],
 	)
 
 	model = AutoModelForCausalLM.from_pretrained(
