@@ -11,7 +11,6 @@ from datasets import Dataset, load_dataset
 from transformers import (
 	AutoModelForCausalLM,
 	AutoTokenizer,
-	DataCollatorForLanguageModeling,
 	Trainer,
 	TrainingArguments,
 )
@@ -210,6 +209,38 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 	}
 
 
+def collate_causal_lm(features: List[Dict[str, List[int]]], tokenizer: AutoTokenizer) -> Dict[str, torch.Tensor]:
+	max_len = max(len(feature["input_ids"]) for feature in features)
+	pad_id = tokenizer.pad_token_id
+	if pad_id is None:
+		raise ValueError("Tokenizer must have a pad_token_id")
+
+	input_ids_batch: List[List[int]] = []
+	attention_mask_batch: List[List[int]] = []
+	labels_batch: List[List[int]] = []
+
+	for feature in features:
+		input_ids = list(feature["input_ids"])
+		attention_mask = list(feature["attention_mask"])
+		labels = list(feature["labels"])
+		pad_len = max_len - len(input_ids)
+		if pad_len < 0:
+			input_ids = input_ids[:max_len]
+			attention_mask = attention_mask[:max_len]
+			labels = labels[:max_len]
+			pad_len = 0
+
+		input_ids_batch.append(input_ids + [pad_id] * pad_len)
+		attention_mask_batch.append(attention_mask + [0] * pad_len)
+		labels_batch.append(labels + [-100] * pad_len)
+
+	return {
+		"input_ids": torch.tensor(input_ids_batch, dtype=torch.long),
+		"attention_mask": torch.tensor(attention_mask_batch, dtype=torch.long),
+		"labels": torch.tensor(labels_batch, dtype=torch.long),
+	}
+
+
 def main() -> None:
 	args = parse_args()
 
@@ -288,7 +319,7 @@ def main() -> None:
 		ddp_find_unused_parameters=False,
 	)
 
-	data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+	data_collator = lambda features: collate_causal_lm(features, tokenizer)
 
 	trainer = Trainer(
 		model=model,
