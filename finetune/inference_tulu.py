@@ -12,6 +12,7 @@ directory contains `adapter_config.json`.
 import argparse
 import importlib.util
 import json
+import re
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -119,6 +120,23 @@ def _render_chat_text(messages: List[Dict[str, str]], tokenizer: AutoTokenizer) 
     return "".join(parts)
 
 
+def _truncate_generated_text(text: str) -> str:
+    stop_patterns = [
+        r"\n\s*user\s*\n",
+        r"\n\s*assistant\s*\n",
+        r"\n\s*system\s*\n",
+        r"<\|eot_id\|>",
+        r"<\|start_header_id\|>",
+        r"<\|end_header_id\|>",
+    ]
+    cut_points = [len(text)]
+    for pattern in stop_patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if match:
+            cut_points.append(match.start())
+    return text[: min(cut_points)].strip()
+
+
 def _build_messages(args: argparse.Namespace) -> List[Dict[str, str]]:
     if args.messages_json:
         message_path = Path(args.messages_json)
@@ -216,6 +234,11 @@ def main() -> None:
     attention_mask = inputs["attention_mask"].to(device)
 
     do_sample = args.temperature > 0
+    eos_token_ids = [tokenizer.eos_token_id]
+    eot_token_id = tokenizer.convert_tokens_to_ids("<|eot_id|>")
+    if eot_token_id is not None and eot_token_id not in eos_token_ids and eot_token_id != tokenizer.unk_token_id:
+        eos_token_ids.append(eot_token_id)
+
     with torch.no_grad():
         output_ids = model.generate(
             input_ids=input_ids,
@@ -225,12 +248,13 @@ def main() -> None:
             temperature=args.temperature if do_sample else None,
             top_p=args.top_p if do_sample else None,
             repetition_penalty=args.repetition_penalty,
-            eos_token_id=tokenizer.eos_token_id,
+            eos_token_id=eos_token_ids if len(eos_token_ids) > 1 else eos_token_ids[0],
             pad_token_id=tokenizer.pad_token_id,
         )
 
     continuation_ids = output_ids[0][input_ids.shape[1]:]
     generated_text = tokenizer.decode(continuation_ids, skip_special_tokens=True).strip()
+    generated_text = _truncate_generated_text(generated_text)
 
     print("=== Prompt ===")
     print(json.dumps(messages, ensure_ascii=False, indent=2))
