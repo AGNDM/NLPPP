@@ -29,7 +29,7 @@ def parse_args() -> argparse.Namespace:
 	parser.add_argument(
 		"--model_name",
 		type=str,
-		default="meta-llama/Meta-Llama-3-8B-Instruct",
+		default="meta-llama/Meta-Llama-3-8B",
 		help="Hugging Face model ID for the base model",
 	)
 	parser.add_argument(
@@ -103,17 +103,6 @@ def _to_messages(record: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
 			if normalized:
 				return normalized
 
-	instruction = str(record.get("instruction", "")).strip()
-	question = str(record.get("question", "")).strip()
-	prompt = instruction or question
-	response = str(record.get("response", record.get("output", record.get("answer", "")))).strip()
-
-	if prompt and response:
-		return [
-			{"role": "user", "content": prompt},
-			{"role": "assistant", "content": response},
-		]
-
 	return None
 
 
@@ -129,6 +118,30 @@ def _load_local_dataset(path: str, split: str) -> Dataset:
 	raise ValueError("Unsupported --data_path. Use .json, .jsonl, or .parquet")
 
 
+def _render_chat_text(messages: List[Dict[str, str]], tokenizer: AutoTokenizer) -> str:
+	chat_template = getattr(tokenizer, "chat_template", None)
+	if chat_template:
+		return tokenizer.apply_chat_template(
+			messages,
+			tokenize=False,
+			add_generation_prompt=False,
+		)
+
+	# Fallback for base models without chat_template:
+	# keep Tulu role/content turns and render with Llama-3 header/eot style.
+	parts: List[str] = ["<|begin_of_text|>"]
+	for turn in messages:
+		role = str(turn.get("role", "user")).strip().lower()
+		content = str(turn.get("content", "")).strip()
+		if not content:
+			continue
+		if role not in {"system", "user", "assistant"}:
+			role = "user"
+		parts.append(f"<|start_header_id|>{role}<|end_header_id|>\\n\\n{content}<|eot_id|>")
+
+	return "".join(parts)
+
+
 def build_text_dataset(raw_dataset: Dataset, tokenizer: AutoTokenizer) -> Dataset:
 	rows: List[Dict[str, str]] = []
 	for record in raw_dataset:
@@ -136,11 +149,7 @@ def build_text_dataset(raw_dataset: Dataset, tokenizer: AutoTokenizer) -> Datase
 		if not messages:
 			continue
 
-		text = tokenizer.apply_chat_template(
-			messages,
-			tokenize=False,
-			add_generation_prompt=False,
-		)
+		text = _render_chat_text(messages, tokenizer)
 		if text:
 			rows.append({"text": text})
 
