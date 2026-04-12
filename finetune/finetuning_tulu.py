@@ -16,6 +16,13 @@ from transformers import (
 	TrainingArguments,
 )
 
+try:
+	from peft import LoraConfig, TaskType, get_peft_model
+except ImportError:
+	LoraConfig = None
+	TaskType = None
+	get_peft_model = None
+
 
 def parse_args() -> argparse.Namespace:
 	parser = argparse.ArgumentParser(description="Fine-tune Llama 8B on a Tulu dataset")
@@ -28,7 +35,7 @@ def parse_args() -> argparse.Namespace:
 	parser.add_argument(
 		"--dataset_name",
 		type=str,
-		default="allenai/tulu-v2-sft-mixture",
+		default="allenai/tulu-3-sft-mixture",
 		help="HF dataset name for Tulu (used when --data_path is not provided)",
 	)
 	parser.add_argument(
@@ -53,6 +60,15 @@ def parse_args() -> argparse.Namespace:
 	parser.add_argument("--save_steps", type=int, default=200)
 	parser.add_argument("--save_total_limit", type=int, default=2)
 	parser.add_argument("--seed", type=int, default=42)
+	parser.add_argument("--lora_r", type=int, default=16)
+	parser.add_argument("--lora_alpha", type=int, default=32)
+	parser.add_argument("--lora_dropout", type=float, default=0.05)
+	parser.add_argument(
+		"--lora_target_modules",
+		type=str,
+		nargs="+",
+		default=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+	)
 
 	return parser.parse_args()
 
@@ -150,6 +166,8 @@ def main() -> None:
 
 	if not _has_accelerate():
 		raise RuntimeError("Missing dependency: accelerate. Install with `pip install accelerate`.")
+	if get_peft_model is None or LoraConfig is None or TaskType is None:
+		raise RuntimeError("Missing dependency: peft. Install with `pip install peft`.")
 
 	tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=True)
 	if tokenizer.pad_token is None:
@@ -175,6 +193,18 @@ def main() -> None:
 		torch_dtype=torch.bfloat16,
 	)
 	model.config.pad_token_id = tokenizer.pad_token_id
+	model.config.use_cache = False
+
+	lora_config = LoraConfig(
+		r=args.lora_r,
+		lora_alpha=args.lora_alpha,
+		lora_dropout=args.lora_dropout,
+		target_modules=args.lora_target_modules,
+		task_type=TaskType.CAUSAL_LM,
+		bias="none",
+	)
+	model = get_peft_model(model, lora_config)
+	model.print_trainable_parameters()
 
 	training_args = TrainingArguments(
 		output_dir=args.output_dir,
