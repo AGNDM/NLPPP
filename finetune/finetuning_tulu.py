@@ -166,7 +166,6 @@ def tokenize_function(examples: Dict[str, List[str]], tokenizer: AutoTokenizer, 
 		max_length=max_length,
 		padding=False,
 	)
-	tokenized["labels"] = tokenized["input_ids"].copy()
 	return tokenized
 
 
