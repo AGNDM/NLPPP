@@ -166,7 +166,7 @@ def _load_model_and_tokenizer(args: argparse.Namespace):
         torch_dtype = torch.float32
         device = torch.device("cpu")
 
-    model_source = checkpoint_dir if (checkpoint_dir / "config.json").exists() else args.model_name
+    model_source = checkpoint_dir # if (checkpoint_dir / "config.json").exists() else args.model_name
     load_kwargs: Dict[str, Any] = {"torch_dtype": torch_dtype}
     if torch.cuda.is_available() and _has_accelerate():
         load_kwargs["device_map"] = "auto"
