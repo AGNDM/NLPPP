@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Finetune Qwen-0.5B on the Qasper dataset.
 
-- Dataset: Parquet file at `data/qasper/processed/tinetuning_dataset.parquet`
-- Columns: `prompt` (input) and `response` (target)
+- Dataset: Parquet file at `data/qasper/processed/tinetuning_dataset_fil.parquet`
+- Columns: `input` (input JSON-style text) and `answer` (target plain text)
 - Uses HuggingFace `transformers` Trainer.
 - Intended to be launched with `accelerate launch` for multi‑GPU (4× GH200) support.
 - After training, generates 5 sample completions and writes them to `samples.txt`.
@@ -31,13 +31,13 @@ def parse_args():
     parser.add_argument(
         "--data_path",
         type=str,
-        default="data/qasper/processed/tinetuning_dataset.parquet",
+        default="data/qasper/processed/tinetuning_dataset_fil.parquet",
         help="Path to the parquet dataset",
     )
     parser.add_argument(
         "--model_name",
         type=str,
-        default="Qwen/Qwen-0.5B",
+        default="meta-llama/Meta-Llama-3-8B",
         help="HuggingFace model identifier",
     )
     parser.add_argument(
@@ -93,12 +93,12 @@ def parse_args():
 
 def load_dataset(data_path: str) -> Dataset:
     df = pd.read_parquet(data_path)
-    # Expect columns `prompt` and `response`
-    if not {"prompt", "response"}.issubset(df.columns):
-        raise ValueError("Parquet file must contain 'prompt' and 'response' columns")
-    df["prompt"] = df["prompt"].astype(str)
-    df["response"] = df["response"].astype(str)
-    return Dataset.from_pandas(df[["prompt", "response"]])
+    # Expect columns `input` and `answer`
+    if not {"input", "answer"}.issubset(df.columns):
+        raise ValueError("Parquet file must contain 'input' and 'answer' columns")
+    df["input"] = df["input"].astype(str)
+    df["answer"] = df["answer"].astype(str)
+    return Dataset.from_pandas(df[["input", "answer"]])
 
 
 def tokenize_function(examples, tokenizer, max_len):
@@ -114,7 +114,7 @@ def tokenize_function(examples, tokenizer, max_len):
     if eos_token_id is None:
         raise ValueError("Tokenizer must have an eos_token_id")
 
-    for prompt, response in zip(examples["prompt"], examples["response"]):
+    for prompt, response in zip(examples["input"], examples["answer"]):
         prompt_ids = tokenizer(prompt, add_special_tokens=False)["input_ids"]
         response_ids = tokenizer(response, add_special_tokens=False)["input_ids"]
 
@@ -182,7 +182,7 @@ def main():
         tokenized_dataset = raw_dataset.map(
             lambda x: tokenize_function(x, tokenizer, args.max_seq_length),
             batched=True,
-            remove_columns=["prompt", "response"],
+            remove_columns=["input", "answer"],
         )
 
         data_collator = DataCollatorForSeq2Seq(
@@ -228,7 +228,7 @@ def main():
             print(f"Generating {args.num_samples} sample completions...")
             # Use first N prompts from the original parquet for demonstration
             df = pd.read_parquet(args.data_path)
-            sample_prompts = df["prompt"].astype(str).head(args.num_samples).tolist()
+            sample_prompts = df["input"].astype(str).head(args.num_samples).tolist()
             model.eval()
             generated_texts = []
             for i, prompt in enumerate(sample_prompts):
