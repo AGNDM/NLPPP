@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Finetune Qwen-0.5B on the Qasper dataset.
+"""Finetune llama-8B on the Qasper dataset.
 
-- Dataset: Parquet file at `data/qasper/processed/tinetuning_dataset_fil.parquet`
+- Dataset: Parquet file at `data/qasper/processed/finetuning_dataset_final.parquet`
 - Columns: `input` (input JSON-style text) and `answer` (target plain text)
 - Uses HuggingFace `transformers` Trainer.
 - Intended to be launched with `accelerate launch` for multi‑GPU (4× GH200) support.
@@ -27,11 +27,11 @@ from transformers import (
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Finetune Qwen-0.5B on Qasper")
+    parser = argparse.ArgumentParser(description="Finetune llama-8B on Qasper")
     parser.add_argument(
         "--data_path",
         type=str,
-        default="data/qasper/processed/tinetuning_dataset_fil.parquet",
+        default="data/qasper/processed/finetuning_dataset_final.parquet",
         help="Path to the parquet dataset",
     )
     parser.add_argument(
@@ -43,7 +43,7 @@ def parse_args():
     parser.add_argument(
         "--output_dir",
         type=str,
-        default="finetune/output_qwen_0.5B",
+        default="finetune/output_llama_8B",
         help="Directory to save checkpoints and final model",
     )
     parser.add_argument(
