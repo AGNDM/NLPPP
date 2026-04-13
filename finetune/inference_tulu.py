@@ -234,9 +234,9 @@ def main() -> None:
     attention_mask = inputs["attention_mask"].to(device)
 
     do_sample = args.temperature > 0
-    eos_token_ids = [tokenizer.eos_token_id]
     
-    # Try to find <|eot_id|> token. First try direct token conversion, then try encoding.
+    # For Llama-3-Chat format, <|eot_id|> is the primary conversation end marker.
+    # Try to find it first, then fall back to the tokenizer's eos_token_id.
     eot_token_ids = tokenizer.convert_tokens_to_ids(["<|eot_id|>"])
     eot_token_id = None
     
@@ -249,14 +249,21 @@ def main() -> None:
         if encoded and encoded[0] != tokenizer.unk_token_id:
             eot_token_id = encoded[0]
     
-    if eot_token_id is not None and eot_token_id not in eos_token_ids:
+    # Build eos_token_ids list with <|eot_id|> as primary if found
+    eos_token_ids = []
+    if eot_token_id is not None:
         eos_token_ids.append(eot_token_id)
-        print(f"Added <|eot_id|> (token ID: {eot_token_id}) to eos_token_ids")
-    else:
-        print(f"Warning: Could not find valid <|eot_id|> token ID. eot_token_ids={eot_token_ids}")
+        print(f"Using <|eot_id|> (token ID: {eot_token_id}) as primary EOS token")
+    
+    # Add tokenizer.eos_token_id as fallback if different
+    if tokenizer.eos_token_id not in eos_token_ids:
+        eos_token_ids.append(tokenizer.eos_token_id)
+    
+    if not eos_token_ids:
+        raise RuntimeError("Could not find any valid EOS tokens")
 
     print(f"EOS token IDs: {eos_token_ids}")
-    print(f"tokenizer.eos_token_id: {tokenizer.eos_token_id} ({repr(tokenizer.eos_token)})")
+    print(f"Primary EOS: {eos_token_ids[0]} (will stop when model generates this token)")
 
     with torch.no_grad():
         output_ids = model.generate(
