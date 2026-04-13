@@ -25,11 +25,31 @@ def main():
     run_output_dir = os.path.join(output_root, new_model)
     os.makedirs(output_root, exist_ok=True)
     # Load & prepare model
-    model = AutoModelForCausalLM.from_pretrained(
-        "meta-llama/Meta-Llama-3-8B",
-        quantization_config=bnb_config,
-        torch_dtype=torch.bfloat16,
-    )
+    requested_attn_impl = os.getenv("ATTN_IMPLEMENTATION", "flash_attention_2")
+    flash_attn_enabled = False
+    try:
+        model = AutoModelForCausalLM.from_pretrained(
+            "meta-llama/Meta-Llama-3-8B",
+            quantization_config=bnb_config,
+            torch_dtype=torch.bfloat16,
+            attn_implementation=requested_attn_impl,
+        )
+        flash_attn_enabled = requested_attn_impl in {
+            "flash_attention_2",
+            "flash_attention_3",
+            "kernels-community/flash-attn2",
+            "kernels-community/flash-attn3",
+            "kernels-community/vllm-flash-attn3",
+        }
+        print(f"Using attention implementation: {requested_attn_impl}")
+    except Exception as exc:
+        print(f"Failed to load with attn_implementation={requested_attn_impl}: {exc}")
+        print("Falling back to default attention implementation.")
+        model = AutoModelForCausalLM.from_pretrained(
+            "meta-llama/Meta-Llama-3-8B",
+            quantization_config=bnb_config,
+            torch_dtype=torch.bfloat16,
+        )
     tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
     source_tokenizer_path = "meta-llama/Meta-Llama-3-8B-Instruct"
     model, tokenizer, added_tokens = clone_chat_template(
@@ -61,17 +81,22 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
 
     # Throughput knobs (override via environment variables if needed)
-    per_device_train_batch_size = int(os.getenv("PER_DEVICE_TRAIN_BATCH_SIZE", "16"))
+    per_device_train_batch_size = int(os.getenv("PER_DEVICE_TRAIN_BATCH_SIZE", "4"))
     per_device_eval_batch_size = int(os.getenv("PER_DEVICE_EVAL_BATCH_SIZE", str(per_device_train_batch_size)))
     gradient_accumulation_steps = int(os.getenv("GRADIENT_ACCUMULATION_STEPS", "1"))
-    max_seq_len = int(os.getenv("MAX_SEQ_LEN", "2048"))
+    max_seq_len = int(os.getenv("MAX_SEQ_LEN", "1024"))
     use_packing = os.getenv("USE_PACKING", "true").lower() == "true"
     use_gradient_checkpointing = os.getenv("USE_GRADIENT_CHECKPOINTING", "false").lower() == "true"
+
+    if use_packing and not flash_attn_enabled:
+        print("WARNING: packing requested but flash attention is unavailable; disabling packing for safety.")
+        use_packing = False
 
     print(
         f"Train config: bs={per_device_train_batch_size}, eval_bs={per_device_eval_batch_size}, "
         f"ga={gradient_accumulation_steps}, max_seq_len={max_seq_len}, "
-        f"packing={use_packing}, grad_ckpt={use_gradient_checkpointing}"
+        f"packing={use_packing}, grad_ckpt={use_gradient_checkpointing}, "
+        f"attn_impl={'flash' if flash_attn_enabled else 'default'}"
     )
 
     # LoRA adapter
