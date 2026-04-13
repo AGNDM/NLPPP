@@ -1,0 +1,86 @@
+[
+    {
+        "id": "nli_001",
+        "category": "directional",
+        "abstract_a": "In this work we analyze the role of attention weights in Transformer-based models. Our experiments on BERT demonstrate that attention weights are strongly correlated with token importance and are therefore reliable indicators of model reasoning. We show that removing high-attention tokens leads to a significant drop in performance of 23.4 F1 on SQuAD, confirming that attention weights provide a faithful explanation of model behaviour.",
+        "abstract_b": "We investigate whether attention weights constitute faithful explanations in Transformer-based models. Contrary to prior claims, our experiments on BERT show that attention weights are poorly correlated with token importance and do not reliably indicate model reasoning. Removing high-attention tokens leads to negligible performance degradation of 1.2 F1 on SQuAD, confirming that attention weights are not faithful explanations of model behaviour.",
+        "expected": "contradiction"
+    },
+    {
+        "id": "nli_002",
+         "category": "neutral_topical",
+        "abstract_a": "Multi-head attention scales quadratically with sequence length, making it prohibitively expensive for long documents. This is a fundamental limitation of the attention mechanism as originally proposed.",
+        "abstract_b": "Sparse multi-head attention scales with O(n log n).",
+        "expected": "neutral"
+    },
+    {
+        "id": "nli_003",
+        "category": "numerical",
+        "abstract_a": "Multi-head attention scales quadratically with sequence length, making it prohibitively expensive for long documents. This is a fundamental limitation of the attention mechanism as originally proposed.",
+        "abstract_b": "Multi-head attention scales linearly with sequence length, as demonstrated by our experiments on sequences up to 100k tokens, confirming that standard attention mechanisms are efficient even for very long documents.",
+        "expected": "contradiction"
+    },
+    {
+        "id": "nli_004",
+        "category": "neutral_topical",
+        "abstract_a": "Sparse multi-head attention scales with O(n log n).",
+        "abstract_b": "Multi-head attention scales linearly with sequence length, as demonstrated by our experiments on sequences up to 100k tokens, confirming that standard attention mechanisms are efficient even for very long documents.",
+        "expected": "neutral"
+    },
+        {
+        "id": "nli_005",
+        "category": "numerical",
+        "abstract_a": "We evaluate our proposed model on the SQuAD benchmark. Our BERT-based approach achieves a state-of-the-art F1 score of 93.2 on the SQuAD 2.0 test set, outperforming all previously reported results.",
+        "abstract_b": "We evaluate our proposed model on the SQuAD benchmark. Our BERT-based approach achieves an F1 score of 78.4 on the SQuAD 2.0 test set, which falls short of the current state-of-the-art results reported in the literature.",
+        "expected": "contradiction"
+    },
+    {
+        "id": "nli_006",
+        "category": "named_entity",
+        "abstract_a": "We demonstrate that RoBERTa achieves the highest accuracy on the GLUE benchmark among all tested models, outperforming BERT, XLNet, and ALBERT by a significant margin.",
+        "abstract_b": "We demonstrate that BERT achieves the highest accuracy on the GLUE benchmark among all tested models, outperforming RoBERTa, XLNet, and ALBERT by a significant margin.",
+        "expected": "contradiction"
+    },
+    {
+        "id": "nli_007",
+        "category": "named_entity",
+        "abstract_a": "Our experiments show that GPT-2 outperforms BERT on open-ended text generation tasks, producing more coherent and fluent outputs as measured by human evaluators.",
+        "abstract_b": "We fine-tune GPT-2 on a domain-specific corpus and evaluate its performance on text summarisation, finding that it produces abstractive summaries competitive with state-of-the-art models.",
+        "expected": "neutral"
+    },
+    {
+        "id": "nli_008",
+        "category": "directional",
+        "abstract_a": "We propose a novel pruning strategy for transformer models and show that it significantly outperforms knowledge distillation on inference speed benchmarks while retaining 98% of the original model accuracy.",
+        "abstract_b": "We conduct a comprehensive comparison of model compression techniques and find that knowledge distillation consistently outperforms pruning approaches on inference speed benchmarks across all evaluated architectures.",
+        "expected": "contradiction"
+    },
+    {
+        "id": "nli_009",
+        "category": "directional",
+        "abstract_a": "Our analysis shows that increasing the number of attention heads beyond 8 leads to diminishing returns on downstream task performance, with no statistically significant improvement observed beyond this threshold.",
+        "abstract_b": "We investigate the effect of model depth on NLP task performance and find that adding more transformer layers consistently improves results across all benchmarks tested.",
+        "expected": "contradiction"
+    },
+    {
+        "id": "nli_010",
+        "category": "neutral_topical",
+        "abstract_a": "We propose a new positional encoding scheme for transformers that improves performance on long document tasks. Our method replaces sinusoidal encodings with learned relative position embeddings.",
+        "abstract_b": "We analyse the limitations of sinusoidal positional encodings in standard transformer architectures and propose an alternative based on rotary position embeddings, demonstrating improved generalisation on sequences longer than those seen during training.",
+        "expected": "neutral"
+    },
+    {
+        "id": "nli_011",
+        "category": "numerical",
+        "abstract_a": "We introduce a lightweight transformer variant with 6 attention layers that achieves 89.3 F1 on CoNLL-2003 named entity recognition, matching the performance of much larger models.",
+        "abstract_b": "We introduce a lightweight transformer variant with 6 attention layers that achieves 71.2 F1 on CoNLL-2003 named entity recognition, representing a reasonable trade-off between model size and performance.",
+        "expected": "contradiction"
+    },
+    {
+        "id": "nli_012",
+        "category": "neutral_topical",
+        "abstract_a": "We propose a curriculum learning strategy for fine-tuning BERT on low-resource NER tasks, showing consistent improvements over standard fine-tuning across five languages.",
+        "abstract_b": "We investigate data augmentation techniques for improving BERT performance on low-resource named entity recognition, finding that back-translation yields the most consistent gains across languages.",
+        "expected": "neutral"
+    }
+]
