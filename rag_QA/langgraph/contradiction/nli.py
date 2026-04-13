@@ -4,20 +4,39 @@ from qdrant_client.models import ScoredPoint
 
 
 def _compute_similarity(vec_a:np.ndarray, vec_b: np.ndarray) -> float:
+    """
+    Computes the cosine similarity between two dense vectors.
+
+    Used as a pre-filter before NLI inference. Only chunk pairs above the
+    similarity threshold are sent to the NLI model, reducing unnecessary
+    inference calls on semantically unrelated pairs.
+    """
     return float(vec_a.dot(vec_b) / (np.linalg.norm(vec_a) * np.linalg.norm(vec_b)))
 
 
-def _get_label(scores):
+def _get_label(scores) -> list[str]:
+    """Converts raw NLI model scores into string labels."""
     label_mapping = ['contradiction', 'entailment', 'neutral']
     labels = [label_mapping[score_max] for score_max in scores.argmax(axis=1)]
     return labels
 
 
 def _load_nli_model(model_name: str) -> CrossEncoder:
+    """Loads a CrossEncoder NLI model by name."""
     return CrossEncoder(model_name)
 
 
-def _find_candidates(results: list[ScoredPoint], similarity_threshold: float = 0.65) -> list[tuple[int, int, float]]:
+def _find_candidates(
+        results: list[ScoredPoint],
+        similarity_threshold: float = 0.65
+    ) -> list[tuple[int, int, float]]:
+    """
+    Identifies pairs of retrieved chunks that are semantically similar enough to 
+    potentially contradict each other.
+    
+    Computes pairwise cosine similarity across all retrieved chunks and returns
+    only pairs above the similarity threshold. 
+    """
     candidates: list[tuple[int, int, float]] = []
     if len(results) > 1:
         for i, a in enumerate(results):
@@ -28,7 +47,11 @@ def _find_candidates(results: list[ScoredPoint], similarity_threshold: float = 0
     return candidates
 
 
-def _get_contradiction_pairs(candidates: list[tuple[int, int, float]], labels: list[str]) -> list[tuple[int, int]]:
+def _get_contradiction_pairs(
+        candidates: list[tuple[int, int, float]],
+        labels: list[str]
+    ) -> list[tuple[int, int]]:
+    """Filters NLI-labelled candidate pairs down to those classified as contradictions."""
     return [
         (i, j)
         for (i, j, _), label in zip(candidates, labels)
@@ -37,11 +60,21 @@ def _get_contradiction_pairs(candidates: list[tuple[int, int, float]], labels: l
 
 
 def _run_nli(pairs: list[tuple[str, str]], model: CrossEncoder) -> list[str]:
+    """Runs NLI inference over a list of text pairs."""
     scores = model.predict(pairs)
     return _get_label(scores)
 
 
-def _build_pairs(results: list[ScoredPoint], candidates: list[tuple[int, int, float]]) -> list[tuple[str, str]]:
+def _build_pairs(
+        results: list[ScoredPoint],
+        candidates: list[tuple[int, int, float]]
+    ) -> list[tuple[str, str]]:
+    """
+    Constructs text pairs for NLI inference from candidate index pairs.
+
+    Extracts the abstract field from each chunk's Qdrant payload for the
+    chunks identified as candidates by _find_candidates.
+    """
     return [
         (results[i].payload["abstract"], results[j].payload["abstract"])
         for i, j, _ in candidates
@@ -49,6 +82,20 @@ def _build_pairs(results: list[ScoredPoint], candidates: list[tuple[int, int, fl
 
 
 def test_contradiction_pipeline(pairs: list[tuple[str, str]], nli_model_name: str) -> list[tuple[int, int]]:
+    """
+    Runs the NLI contradiction pipeline on a list of pre-built text pairs.
+
+    Intended for testing and offline evaluation of the NLI component in
+    isolation, without requiring a live Qdrant retrieval step.
+
+    Args:
+        pairs: List of (text_a, text_b) string pairs to classify.
+        nli_model_name: HuggingFace model identifier for the NLI CrossEncoder.
+
+    Returns:
+        List of label strings ('contradiction', 'entailment', 'neutral'),
+        one per input pair.
+    """
     model = _load_nli_model(nli_model_name)
     return _run_nli(pairs, model)
     

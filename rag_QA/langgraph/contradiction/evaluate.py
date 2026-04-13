@@ -4,16 +4,36 @@ from pathlib import Path
 from nli import _load_nli_model, _run_nli
 
 def load_test_cases(path: Path) -> list[dict]:
+    """
+    Loads NLI test cases from a JSON file.
+
+    Each test case is expected to have the following fields:
+        id:         Unique identifier string.
+        category:   Category label for grouped reporting (e.g. 'domain_specific',
+                    'standard_contradiction').
+        abstract_a: First chunk text.
+        abstract_b: Second chunk text.
+        expected:   Ground truth label ('contradiction', 'entailment', 'neutral').
+    """
     with open(path) as f:
         return json.load(f)
 
 
-def save_results(results: dict, path: Path):
+def save_results(results: dict, path: Path) -> None:
+    """Serialises evaluation results to a JSON file."""
     with open(path, "w") as f:
         json.dump(results, f, indent=2)
 
 
 def evaluate(test_cases: list[dict], model_name: str) -> dict:
+    """
+    Runs NLI evaluation over a set of labelled test cases and returns
+    structured results.
+
+    For each test case, runs the NLI model on the (abstract_a, abstract_b)
+    pair and compares the predicted label against the expected label.
+    Results are aggregated overall and broken down by category.
+    """
     model = _load_nli_model(model_name)
     pairs = [(case["abstract_a"], case["abstract_b"]) for case in test_cases]
     labels = _run_nli(pairs, model)
@@ -44,12 +64,17 @@ def evaluate(test_cases: list[dict], model_name: str) -> dict:
                 "category": category,
                 "expected": expected,
                 "got": label
-            })
-    
+            }) 
     return results
 
 
-def print_results(results: dict):
+def print_results(results: dict) -> None:
+    """
+    Prints a summary of evaluation results to stdout.
+
+    Outputs overall accuracy, per-category breakdown, and a list of
+    failed predictions with their expected and actual labels.
+    """
     total = results["overall"]["total"]
     correct = results["overall"]["correct"]
     print(f"\nModel: {results['model']}")
