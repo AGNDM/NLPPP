@@ -274,7 +274,7 @@ def main() -> None:
             temperature=args.temperature if do_sample else None,
             top_p=args.top_p if do_sample else None,
             repetition_penalty=args.repetition_penalty,
-            eos_token_id=eos_token_ids if len(eos_token_ids) > 1 else eos_token_ids[0],
+            eos_token_id=eos_token_ids,  # Pass list of all EOS tokens
             pad_token_id=tokenizer.pad_token_id,
         )
 
@@ -286,14 +286,28 @@ def main() -> None:
     print(f"Total output length: {len(output_ids[0])}")
     print(f"Input length: {input_ids.shape[1]}")
     print(f"Generated tokens: {len(continuation_ids)}")
+    
+    # Check if any of the generated tokens are in eos_token_ids
+    eot_appearances = sum(1 for tid in continuation_ids if tid in eos_token_ids)
+    print(f"EOS tokens in generated sequence: {eot_appearances}")
+    
     if len(continuation_ids) > 0:
         last_token_id = continuation_ids[-1].item() if hasattr(continuation_ids[-1], 'item') else continuation_ids[-1]
         last_token_text = tokenizer.decode([last_token_id])
         print(f"Last generated token ID: {last_token_id} ({repr(last_token_text)})")
+        
+        # Show last 5 tokens for context
+        if len(continuation_ids) >= 5:
+            last_5_ids = [tid.item() if hasattr(tid, 'item') else tid for tid in continuation_ids[-5:]]
+            print(f"Last 5 token IDs: {last_5_ids}")
+            last_5_text = tokenizer.decode(last_5_ids)
+            print(f"Last 5 tokens decoded: {repr(last_5_text)}")
+        
         if last_token_id in eos_token_ids:
             print(f"✓ Stopped at EOS token (as expected)")
         elif len(continuation_ids) >= args.max_new_tokens:
             print(f"⚠ Hit max_new_tokens limit ({args.max_new_tokens}), did NOT hit EOS token")
+            print(f"  This means the model did NOT generate any stop token (128009 or 128001)")
         else:
             print(f"⚠ Unexpected stop condition")
     
