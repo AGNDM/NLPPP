@@ -228,6 +228,11 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 			if eot_ids and len(full_ids) > 0:
 				if full_ids[-1] in eot_ids:
 					print(f"✓ Sample ends with <|eot_id|> (token {full_ids[-1]})")
+					# Check if the eot_id itself is marked as trainable (not -100)
+					if full_labels[-1] != -100:
+						print(f"  ✓ <|eot_id|> is marked as TRAINABLE (label: {full_labels[-1]})")
+					else:
+						print(f"  ⚠ <|eot_id|> is MASKED (-100), model won't learn to generate it!")
 				elif full_ids[-1] == bos_token_ids[-1] if bos_token_ids else False:
 					print(f"⚠ Sample ends with BOS, may be too short")
 				else:
