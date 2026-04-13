@@ -6,6 +6,7 @@ from adapters import AutoAdapterModel
 import os
 import torch
 from state import RAGState
+import json
 
 load_dotenv()  # load .env 
 
@@ -30,6 +31,16 @@ def text_to_embedding(text):
     embedding = output.last_hidden_state[:, 0, :]
     return embedding.numpy().flatten()
 
+def qdrant_results_to_json(results):
+    json_list = []
+    for point in results:
+        json_list.append({
+            "id": point.id,
+            "score": point.score,
+            "payload": point.payload
+        })
+    return json_list
+
 def query_vector_trunks(state:RAGState):
     query_vector = text_to_embedding(state["rewritten_query"])
     results = qdrant_client.query_points(
@@ -40,7 +51,9 @@ def query_vector_trunks(state:RAGState):
         with_vectors=False
     ).points
 
+    json_data = qdrant_results_to_json(results)
+
     return {
-        "retrieved_chunks": results
+        "retrieved_chunks": json_data
     }
 

@@ -2,6 +2,7 @@ from langgraph.graph import StateGraph, START, END
 from rewrite import query_rewrite
 from state import RAGState
 from rag import query_vector_trunks
+from nli import nli_detect
 
 
 # ===================== 5. 生成最终回答（需要拼接数据结构） =====================
@@ -42,11 +43,12 @@ graph = StateGraph(RAGState)
 # add nodes
 graph.add_node("query_rewrite", query_rewrite)
 graph.add_node("get_retrived_trunks", query_vector_trunks)
-# graph.add_node("generate_answer", generate_answer_node)
+graph.add_node("contradict_detect", nli_detect)
 
 # START → rewrite → retrive → NLI → generate answer → END
 graph.add_edge(START, "query_rewrite")
 graph.add_edge("query_rewrite", "get_retrived_trunks")
+graph.add_edge("get_retrived_trunks", "contradict_detect")
 # graph.add_edge("retrieve", "generate_answer")
 # graph.add_edge("generate_answer", END)
 
@@ -58,7 +60,7 @@ app = graph.compile()
 if __name__ == "__main__":
     pass
     # user input
-    user_query = "attention"
+    user_query = "attention ? "
 
     # initial state
     initial_state = {
