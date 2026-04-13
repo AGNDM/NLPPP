@@ -1,6 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import load_dataset
-from peft import LoraConfig, get_peft_model
+from peft import LoraConfig
 from trl import SFTTrainer, SFTConfig, clone_chat_template
 import torch
 import json
@@ -44,7 +44,6 @@ def main():
         bias="none", task_type="CAUSAL_LM",
         target_modules=['up_proj','down_proj','gate_proj','k_proj','q_proj','v_proj','o_proj']
     )
-    model = get_peft_model(model, peft_config)
     print("Loading and setting up Dataset for Training")
     # Dataset prep
     ds = load_dataset("allenai/tulu-3-sft-mixture", split="all")
