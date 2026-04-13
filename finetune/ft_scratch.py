@@ -1,6 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import load_dataset
-from peft import LoraConfig, PeftModel
+from peft import LoraConfig, PeftModel, prepare_model_for_kbit_training
 from trl import SFTTrainer, SFTConfig, clone_chat_template, DataCollatorForCompletionOnlyLM
 import torch
 import json
@@ -109,6 +109,11 @@ def main():
         f"attn_impl={'flash' if flash_attn_enabled else 'default'}"
     )
 
+    print("Preparing model for k-bit training...")
+    model = prepare_model_for_kbit_training(
+        model, use_gradient_checkpointing=use_gradient_checkpointing
+    )
+
     # LoRA adapter
     peft_config = LoraConfig(
         r=16, lora_alpha=32, lora_dropout=0.05,
@@ -166,7 +171,7 @@ def main():
         "dataset_text_field": "text",
         "packing": use_packing,
         "save_strategy": "steps",
-        "save_steps": 1000,
+        "save_steps": 100,
         "save_total_limit": 10,
     }
 
