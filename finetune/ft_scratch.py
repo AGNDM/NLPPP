@@ -163,6 +163,7 @@ def main():
         "save_strategy": "steps",
         "save_steps": 100,
         "save_total_limit": 10,
+        "ddp_find_unused_parameters": False,
     }
 
     sft_init_params = inspect.signature(SFTConfig.__init__).parameters
