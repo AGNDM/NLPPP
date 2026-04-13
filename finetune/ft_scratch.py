@@ -30,11 +30,32 @@ def main():
         torch_dtype=torch.bfloat16,
     )
     tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+    source_tokenizer_path = "meta-llama/Meta-Llama-3-8B-Instruct"
     model, tokenizer, added_tokens = clone_chat_template(
         model,
         tokenizer,
-        source_tokenizer_path="meta-llama/Meta-Llama-3-8B-Instruct",
+        source_tokenizer_path=source_tokenizer_path,
     )
+
+    if not getattr(tokenizer, "chat_template", None):
+        instruct_tokenizer = AutoTokenizer.from_pretrained(source_tokenizer_path)
+        tokenizer.chat_template = getattr(instruct_tokenizer, "chat_template", None)
+
+    if not getattr(tokenizer, "chat_template", None):
+        raise ValueError("chat_template is still missing after cloning/copying from instruct tokenizer")
+
+    if isinstance(added_tokens, int):
+        added_token_count = added_tokens
+    elif added_tokens is None:
+        added_token_count = 0
+    else:
+        added_token_count = len(added_tokens)
+
+    print(f"chat_template ready: {bool(tokenizer.chat_template)}")
+    print(f"tokens added by clone_chat_template: {added_token_count}")
+    if added_token_count > 0:
+        print("WARNING: New tokens were added. With LoRA-only training, new token embeddings are not fully trained.")
+
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
