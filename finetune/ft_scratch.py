@@ -1,11 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-try:
-    from transformers import clone_chat_template
-except ImportError:
-    from transformers.utils import clone_chat_template
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model
-from trl import SFTTrainer, SFTConfig
+from trl import SFTTrainer, SFTConfig, clone_chat_template
 import torch
 import json
 import os
