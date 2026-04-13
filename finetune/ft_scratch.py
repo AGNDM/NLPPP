@@ -11,6 +11,7 @@ warnings.filterwarnings('ignore')
 
 def main():
     torch.backends.cuda.matmul.allow_tf32 = True
+    torch.set_float32_matmul_precision("high")
     print("Setting UP Configs")
     # QLoRA config
     bnb_config = BitsAndBytesConfig(
@@ -59,6 +60,20 @@ def main():
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
+    # Throughput knobs (override via environment variables if needed)
+    per_device_train_batch_size = int(os.getenv("PER_DEVICE_TRAIN_BATCH_SIZE", "16"))
+    per_device_eval_batch_size = int(os.getenv("PER_DEVICE_EVAL_BATCH_SIZE", str(per_device_train_batch_size)))
+    gradient_accumulation_steps = int(os.getenv("GRADIENT_ACCUMULATION_STEPS", "1"))
+    max_seq_len = int(os.getenv("MAX_SEQ_LEN", "2048"))
+    use_packing = os.getenv("USE_PACKING", "true").lower() == "true"
+    use_gradient_checkpointing = os.getenv("USE_GRADIENT_CHECKPOINTING", "false").lower() == "true"
+
+    print(
+        f"Train config: bs={per_device_train_batch_size}, eval_bs={per_device_eval_batch_size}, "
+        f"ga={gradient_accumulation_steps}, max_seq_len={max_seq_len}, "
+        f"packing={use_packing}, grad_ckpt={use_gradient_checkpointing}"
+    )
+
     # LoRA adapter
     peft_config = LoraConfig(
         r=16, lora_alpha=32, lora_dropout=0.05,
@@ -96,9 +111,9 @@ def main():
     # SFT Trainer (compatible across TRL/Transformers versions)
     sft_kwargs = {
         "output_dir": run_output_dir,
-        "per_device_train_batch_size": 4,
-        "per_device_eval_batch_size": 4,
-        "gradient_accumulation_steps": 1,
+        "per_device_train_batch_size": per_device_train_batch_size,
+        "per_device_eval_batch_size": per_device_eval_batch_size,
+        "gradient_accumulation_steps": gradient_accumulation_steps,
         "disable_tqdm": False,
         "optim": "paged_adamw_32bit",
         "num_train_epochs": 3,
@@ -109,11 +124,11 @@ def main():
         "learning_rate": 2e-4,
         "fp16": False,
         "bf16": True,
-        "gradient_checkpointing": True,
+        "gradient_checkpointing": use_gradient_checkpointing,
         "group_by_length": True,
-        "dataloader_num_workers": 4,
+        "dataloader_num_workers": 16,
         "dataset_text_field": "text",
-        "packing": False,
+        "packing": use_packing,
         "save_strategy": "steps",
         "save_steps": 1000,
         "save_total_limit": 10,
@@ -127,9 +142,9 @@ def main():
         sft_kwargs["eval_strategy"] = strategy_value
 
     if "max_length" in sft_init_params:
-        sft_kwargs["max_length"] = 512
+        sft_kwargs["max_length"] = max_seq_len
     elif "max_seq_length" in sft_init_params:
-        sft_kwargs["max_seq_length"] = 512
+        sft_kwargs["max_seq_length"] = max_seq_len
 
     sft_kwargs = {key: value for key, value in sft_kwargs.items() if key in sft_init_params}
     sft_config = SFTConfig(**sft_kwargs)
