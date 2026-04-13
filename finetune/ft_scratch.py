@@ -1,7 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import load_dataset
 from peft import LoraConfig, PeftModel
-from trl import SFTTrainer, SFTConfig, clone_chat_template
+from trl import SFTTrainer, SFTConfig, clone_chat_template, DataCollatorForCompletionOnlyLM
 import torch
 import json
 import os
@@ -95,7 +95,7 @@ def main():
     per_device_eval_batch_size = int(os.getenv("PER_DEVICE_EVAL_BATCH_SIZE", str(per_device_train_batch_size)))
     gradient_accumulation_steps = int(os.getenv("GRADIENT_ACCUMULATION_STEPS", "1"))
     max_seq_len = int(os.getenv("MAX_SEQ_LEN", "1024"))
-    use_packing = os.getenv("USE_PACKING", "true").lower() == "true"
+    use_packing = False # Forced to False when using DataCollatorForCompletionOnlyLM
     use_gradient_checkpointing = os.getenv("USE_GRADIENT_CHECKPOINTING", "false").lower() == "true"
 
     if use_packing and not flash_attn_enabled:
@@ -185,12 +185,17 @@ def main():
     sft_kwargs = {key: value for key, value in sft_kwargs.items() if key in sft_init_params}
     sft_config = SFTConfig(**sft_kwargs)
 
+    # Use DataCollatorForCompletionOnlyLM to compute loss only on assistant messages
+    response_template = "<|start_header_id|>assistant<|end_header_id|>\n\n"
+    collator = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
+
     trainer_kwargs = {
         "model": model,
         "train_dataset": ds["train"],
         "eval_dataset": ds["test"],
         "peft_config": peft_config,
         "args": sft_config,
+        "data_collator": collator,
     }
     sft_trainer_init_params = inspect.signature(SFTTrainer.__init__).parameters
     if "tokenizer" in sft_trainer_init_params:
