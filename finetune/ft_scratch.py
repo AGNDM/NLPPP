@@ -27,8 +27,9 @@ def main():
         "meta-llama/Meta-Llama-3-8B",
         quantization_config=bnb_config,
         torch_dtype=torch.bfloat16,
+        trust_remote_code=True,
     )
-    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B", trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
