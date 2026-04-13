@@ -1,6 +1,6 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import load_dataset
-from peft import LoraConfig
+from peft import LoraConfig, PeftModel
 from trl import SFTTrainer, SFTConfig, clone_chat_template
 import torch
 import json
@@ -58,9 +58,9 @@ def main():
         source_tokenizer_path=source_tokenizer_path,
     )
 
-    if not getattr(tokenizer, "chat_template", None):
-        instruct_tokenizer = AutoTokenizer.from_pretrained(source_tokenizer_path)
-        tokenizer.chat_template = getattr(instruct_tokenizer, "chat_template", None)
+    #if not getattr(tokenizer, "chat_template", None):
+    #    instruct_tokenizer = AutoTokenizer.from_pretrained(source_tokenizer_path)
+    #    tokenizer.chat_template = getattr(instruct_tokenizer, "chat_template", None)
 
     if not getattr(tokenizer, "chat_template", None):
         raise ValueError("chat_template is still missing after cloning/copying from instruct tokenizer")
@@ -78,7 +78,17 @@ def main():
         print("WARNING: New tokens were added. With LoRA-only training, new token embeddings are not fully trained.")
 
     if tokenizer.pad_token is None:
-        tokenizer.pad_token = tokenizer.eos_token
+        llama3_right_pad_token = "<|finetune_right_pad_id|>"
+        if llama3_right_pad_token in tokenizer.get_vocab():
+            tokenizer.pad_token = llama3_right_pad_token
+            print(f"Using existing tokenizer pad token: {tokenizer.pad_token}")
+        else:
+            added_pad = tokenizer.add_special_tokens({"pad_token": "<|pad|>"})
+            if added_pad > 0:
+                model.resize_token_embeddings(len(tokenizer))
+                print("Added new pad token '<|pad|>' and resized model embeddings.")
+            print(f"Using tokenizer pad token: {tokenizer.pad_token}")
+    model.config.pad_token_id = tokenizer.pad_token_id
 
     # Throughput knobs (override via environment variables if needed)
     per_device_train_batch_size = int(os.getenv("PER_DEVICE_TRAIN_BATCH_SIZE", "4"))
@@ -103,7 +113,8 @@ def main():
     peft_config = LoraConfig(
         r=16, lora_alpha=32, lora_dropout=0.05,
         bias="none", task_type="CAUSAL_LM",
-        target_modules=['up_proj','down_proj','gate_proj','k_proj','q_proj','v_proj','o_proj']
+        target_modules=['up_proj','down_proj','gate_proj','k_proj','q_proj','v_proj','o_proj'],
+        modules_to_save=["embed_tokens", "lm_head"]
     )
     print("Loading and setting up Dataset for Training")
     # Dataset prep
@@ -191,15 +202,29 @@ def main():
 
     print("Starting Training :")
     trainer.train()
-    # 1) Save the LoRA adapter alone (optional)
+    # 1) Save the LoRA adapter alone
     adapter_dir = os.path.join(output_root, new_model)
     trainer.model.save_pretrained(adapter_dir)
+    tokenizer.save_pretrained(adapter_dir)
     print(f"Adapter-only weights saved to '{adapter_dir}'")
 
-    # 2) Merge LoRA adapters into the base model & save full checkpoint
+    # Clear VRAM before full-precision merge
+    del model
+    del trainer
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+    # 2) Reload full-precision base model, attach adapter, merge, and save full checkpoint
     print("Merging adapters into base weights...")
-    # trainer.model is a PeftModel; merge_and_unload() returns a pure transformers model
-    merged_model = trainer.model.merge_and_unload()
+    base_model = AutoModelForCausalLM.from_pretrained(
+        "meta-llama/Meta-Llama-3-8B",
+        torch_dtype=torch.bfloat16,
+        device_map="auto",
+    )
+    base_model.resize_token_embeddings(len(tokenizer))
+
+    model_to_merge = PeftModel.from_pretrained(base_model, adapter_dir)
+    merged_model = model_to_merge.merge_and_unload()
     full_model_dir = os.path.join(output_root, f"{new_model}-full")
     merged_model.save_pretrained(full_model_dir)
     tokenizer.save_pretrained(full_model_dir)
