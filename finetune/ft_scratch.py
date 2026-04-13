@@ -1,7 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model
-from trl import SFTTrainer, SFTConfig, setup_chat_format
+from trl import SFTTrainer, SFTConfig
 import torch
 import json
 import os
@@ -29,7 +29,8 @@ def main():
         torch_dtype=torch.bfloat16,
     )
     tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
-    model, tokenizer = setup_chat_format(model, tokenizer)
+    if tokenizer.pad_token is None:
+        tokenizer.pad_token = tokenizer.eos_token
 
     # LoRA adapter
     peft_config = LoraConfig(
