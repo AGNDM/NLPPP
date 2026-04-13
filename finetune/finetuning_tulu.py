@@ -175,6 +175,10 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 	bos_token_ids = tokenizer("<|begin_of_text|>", add_special_tokens=False)["input_ids"]
 	if not bos_token_ids:
 		bos_token_ids = []
+	
+	eot_ids = tokenizer("<|eot_id|>", add_special_tokens=False)["input_ids"]
+	if not eot_ids:
+		eot_ids = tokenizer.encode("<|eot_id|>", add_special_tokens=False)
 
 	debug_count = 0
 	for messages in examples["messages"]:
@@ -185,8 +189,10 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 
 		if debug_count < 2:
 			print(f"\n=== DEBUG Sample {debug_count} ===")
+			print(f"EOT token IDs: {eot_ids}")
+			print(f"Number of chat turns: {len(messages)}")
 
-		for turn in messages:
+		for turn_idx, turn in enumerate(messages):
 			if not isinstance(turn, dict):
 				continue
 			role = _normalize_role(turn.get("role", turn.get("from", "user")))
@@ -218,6 +224,14 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 			print(f"Final input_ids length: {len(full_ids)}")
 			print(f"Final labels (first 50): {full_labels[:50]}")
 			print(f"Labels with non-100 count: {sum(1 for x in full_labels if x != -100)}")
+			# Check if last assistant token (eot_id) was learned
+			if eot_ids and len(full_ids) > 0:
+				if full_ids[-1] in eot_ids:
+					print(f"✓ Sample ends with <|eot_id|> (token {full_ids[-1]})")
+				elif full_ids[-1] == bos_token_ids[-1] if bos_token_ids else False:
+					print(f"⚠ Sample ends with BOS, may be too short")
+				else:
+					print(f"⚠ Sample does NOT end with <|eot_id|> (ends with token {full_ids[-1]})")
 			print()
 			debug_count += 1
 
