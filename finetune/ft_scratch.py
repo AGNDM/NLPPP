@@ -206,9 +206,15 @@ def main():
     print("DEBUG: Inspecting Model Inputs and Masking")
     print("="*60)
     try:
-        # Grab the first training sample and pass it through the collator
+        # Grab the first training sample
         sample = trainer.train_dataset[0]
-        batch = trainer.data_collator([sample])
+        # Clean up the sample to only include what the collator needs to avoid tensor casting errors
+        collator_input = {k: v for k, v in sample.items() if k in ["input_ids", "attention_mask", "labels"]}
+        if not collator_input:
+            # If the dataset isn't tokenized yet, tokenize it
+            collator_input = tokenizer(sample["text"], truncation=True, max_length=max_seq_len)
+        
+        batch = trainer.data_collator([collator_input])
         in_ids = batch["input_ids"][0]
         lbls = batch["labels"][0]
         
@@ -256,7 +262,6 @@ def main():
         torch_dtype=torch.bfloat16,
         device_map="auto",
     )
-    base_model.resize_token_embeddings(len(tokenizer))
 
     model_to_merge = PeftModel.from_pretrained(base_model, adapter_dir)
     merged_model = model_to_merge.merge_and_unload()
