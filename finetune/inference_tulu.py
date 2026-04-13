@@ -265,11 +265,6 @@ def main() -> None:
 
     print(f"EOS token IDs: {eos_token_ids}")
     print(f"Primary EOS: {eos_token_ids[0]} (will stop when model generates this token)")
-    
-    # IMPORTANT: Set model config to ensure generate() uses our primary EOS token
-    # Use <|eot_id|> (128009) as primary eos_token_id
-    model.config.eos_token_id = eos_token_ids[0]
-    print(f"Set model.config.eos_token_id = {model.config.eos_token_id}")
 
     with torch.no_grad():
         output_ids = model.generate(
@@ -282,7 +277,7 @@ def main() -> None:
             temperature=args.temperature if args.temperature > 0 else None,
             top_p=args.top_p if args.temperature > 0 else None,
             repetition_penalty=args.repetition_penalty,
-            eos_token_id=eos_token_ids[0],  # Primary EOS: <|eot_id|> (128009)
+            eos_token_id=eos_token_ids,
             pad_token_id=tokenizer.pad_token_id,
         )
 
