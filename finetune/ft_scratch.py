@@ -78,16 +78,15 @@ def main():
         print("WARNING: New tokens were added. With LoRA-only training, new token embeddings are not fully trained.")
 
     if tokenizer.pad_token is None:
-        llama3_right_pad_token = "<|finetune_right_pad_id|>"
-        if llama3_right_pad_token in tokenizer.get_vocab():
-            tokenizer.pad_token = llama3_right_pad_token
-            print(f"Using existing tokenizer pad token: {tokenizer.pad_token}")
+        # Prefer using Llama 3's built-in tokens to avoid resizing embeddings
+        if "<|finetune_right_pad_id|>" in tokenizer.get_vocab():
+            tokenizer.pad_token = "<|finetune_right_pad_id|>"
+        elif "<|reserved_special_token_0|>" in tokenizer.get_vocab():
+            tokenizer.pad_token = "<|reserved_special_token_0|>"
         else:
-            added_pad = tokenizer.add_special_tokens({"pad_token": "<|pad|>"})
-            if added_pad > 0:
-                model.resize_token_embeddings(len(tokenizer))
-                print("Added new pad token '<|pad|>' and resized model embeddings.")
-            print(f"Using tokenizer pad token: {tokenizer.pad_token}")
+            tokenizer.pad_token = tokenizer.eos_token
+        print(f"Using tokenizer pad token: {tokenizer.pad_token} to avoid resizing embeddings.")
+    
     model.config.pad_token_id = tokenizer.pad_token_id
 
     # Throughput knobs (override via environment variables if needed)
@@ -209,6 +208,40 @@ def main():
         trainer_kwargs["processing_class"] = tokenizer
 
     trainer = SFTTrainer(**trainer_kwargs)
+
+    # --- DEBUG INFO ---
+    print("\n" + "="*60)
+    print("DEBUG: Inspecting Model Inputs and Masking")
+    print("="*60)
+    try:
+        # Grab the first training sample and pass it through the collator
+        sample = trainer.train_dataset[0]
+        batch = trainer.data_collator([sample])
+        in_ids = batch["input_ids"][0]
+        lbls = batch["labels"][0]
+        
+        print(f"Sequence Length: {len(in_ids)}")
+        print("\n--- 1. RAW DECODED TEXT (with special tokens) ---")
+        print(tokenizer.decode(in_ids, skip_special_tokens=False))
+        
+        print("\n--- 2. MASKING CHECK (Tokens & Labels) ---")
+        unmasked_indices = [i for i, l in enumerate(lbls) if l != -100]
+        if unmasked_indices:
+            start_idx = max(0, unmasked_indices[0] - 10)
+            end_idx = min(len(in_ids), unmasked_indices[0] + 30) # Show 10 tokens before and 30 after the start of assistant response
+            print(f"Showing token-label alignment around the first unmasked token (indices {start_idx} to {end_idx}):")
+            print(f"{'INDEX':<6} | {'TOKEN ID':<10} | {'DECODED TOKEN':<25} | {'LABEL':<6} | {'STATUS'}")
+            print("-" * 75)
+            for i in range(start_idx, end_idx):
+                tok_str = repr(tokenizer.decode([in_ids[i]]))
+                lbl_val = lbls[i].item() if hasattr(lbls[i], 'item') else lbls[i]
+                status = "🟢 LEARNING" if lbl_val != -100 else "🔴 MASKED (-100)"
+                print(f"{i:<6} | {in_ids[i]:<10} | {tok_str:<25} | {lbl_val:<6} | {status}")
+        else:
+            print("⚠️ WARNING: All labels are -100! The collator failed to find the response template. Model will not learn anything.")
+    except Exception as e:
+        print(f"Debug output failed (this won't crash training): {e}")
+    print("="*60 + "\n")
 
     print("Starting Training :")
     trainer.train()
