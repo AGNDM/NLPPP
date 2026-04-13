@@ -136,7 +136,7 @@ def _render_chat_text(messages: List[Dict[str, str]], tokenizer: AutoTokenizer) 
 			continue
 		if role not in {"system", "user", "assistant"}:
 			role = "user"
-		parts.append(f"<|start_header_id|>{role}<|end_header_id|>\\n\\n{content}<|eot_id|>")
+		parts.append(f"<|start_header_id|>{role}<|end_header_id|>\n\n{content}<|eot_id|>")
 
 	return "".join(parts)
 
@@ -174,9 +174,13 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 	if not bos_token_ids:
 		bos_token_ids = []
 
+	debug_count = 0
 	for messages in examples["messages"]:
 		full_ids: List[int] = list(bos_token_ids)
 		full_labels: List[int] = [-100] * len(bos_token_ids)
+
+		if debug_count < 2:
+			print(f"\n=== DEBUG Sample {debug_count} ===")
 
 		for turn in messages:
 			if not isinstance(turn, dict):
@@ -194,9 +198,22 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 			else:
 				full_labels.extend([-100] * len(segment_ids))
 
+			if debug_count < 2:
+				print(f"Role: {role}")
+				print(f"Segment text: {repr(segment_text[:100])}...")
+				print(f"Segment IDs: {segment_ids}")
+				print(f"Segment labels (should be {'non-100' if role == 'assistant' else '-100'}): {[full_labels[i] for i in range(len(full_labels)-len(segment_ids), len(full_labels))]}")
+
 		full_ids = full_ids[:max_length]
 		full_labels = full_labels[:max_length]
 		attention_mask = [1] * len(full_ids)
+
+		if debug_count < 2:
+			print(f"Final input_ids length: {len(full_ids)}")
+			print(f"Final labels (first 50): {full_labels[:50]}")
+			print(f"Labels with non-100 count: {sum(1 for x in full_labels if x != -100)}")
+			print()
+			debug_count += 1
 
 		input_ids_batch.append(full_ids)
 		attention_mask_batch.append(attention_mask)
