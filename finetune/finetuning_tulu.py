@@ -15,12 +15,7 @@ from transformers import (
 	TrainingArguments,
 )
 
-try:
-	from peft import LoraConfig, TaskType, get_peft_model
-except ImportError:
-	LoraConfig = None
-	TaskType = None
-	get_peft_model = None
+from peft import LoraConfig, TaskType, get_peft_model
 
 
 def parse_args() -> argparse.Namespace:
@@ -45,10 +40,8 @@ def parse_args() -> argparse.Namespace:
 	)
 	parser.add_argument("--train_split", type=str, default="train")
 	parser.add_argument("--output_dir", type=str, default="finetune/output_llama_tulu_8B")
-
 	parser.add_argument("--max_seq_length", type=int, default=2048)
 	parser.add_argument("--max_train_samples", type=int, default=None)
-
 	parser.add_argument("--learning_rate", type=float, default=2e-5)
 	parser.add_argument("--num_train_epochs", type=float, default=2.0)
 	parser.add_argument("--per_device_train_batch_size", type=int, default=1)
@@ -77,6 +70,7 @@ def _has_accelerate() -> bool:
 
 
 def _normalize_role(role: str) -> str:
+	# Map role aliases from different instruction datasets into a unified chat schema.
 	role_lower = str(role).strip().lower()
 	if role_lower in {"user", "assistant", "system"}:
 		return role_lower
@@ -88,6 +82,8 @@ def _normalize_role(role: str) -> str:
 
 
 def _to_messages(record: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
+	# Accept multiple common conversation field names and normalize each turn to
+	# {"role": ..., "content": ...} for downstream processing.
 	for key in ("messages", "conversation", "conversations"):
 		if key in record and isinstance(record[key], list):
 			normalized: List[Dict[str, str]] = []
@@ -106,6 +102,8 @@ def _to_messages(record: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
 
 
 def _load_local_dataset(path: str, split: str) -> Dataset:
+	# Load local files by extension; we keep split in the function signature so
+	# callers can stay consistent with HF-style APIs even when local files are used.
 	lower = path.lower()
 	if lower.endswith(".parquet"):
 		frame = pd.read_parquet(path)
@@ -118,6 +116,8 @@ def _load_local_dataset(path: str, split: str) -> Dataset:
 
 
 def _render_chat_text(messages: List[Dict[str, str]], tokenizer: AutoTokenizer) -> str:
+	# Prefer the tokenizer's native chat template when available so formatting
+	# matches the base model's expected instruction style.
 	chat_template = getattr(tokenizer, "chat_template", None)
 	if chat_template:
 		return tokenizer.apply_chat_template(
@@ -127,7 +127,7 @@ def _render_chat_text(messages: List[Dict[str, str]], tokenizer: AutoTokenizer) 
 		)
 
 	# Fallback for base models without chat_template:
-	# keep Tulu role/content turns and render with Llama-3 header/eot style.
+	# render Tulu turns with explicit Llama-3 header/eot tokens.
 	parts: List[str] = ["<|begin_of_text|>"]
 	for turn in messages:
 		role = str(turn.get("role", "user")).strip().lower()
@@ -149,6 +149,8 @@ def _render_turn_text(role: str, content: str) -> str:
 
 
 def build_text_dataset(raw_dataset: Dataset, tokenizer: AutoTokenizer) -> Dataset:
+	# Convert heterogeneous raw records into a clean text+messages dataset where
+	# each row is one trainable conversation example.
 	rows: List[Dict[str, Any]] = []
 	for record in raw_dataset:
 		messages = _to_messages(record)
@@ -176,6 +178,8 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 
 	debug_count = 0
 	for messages in examples["messages"]:
+		# Start each sample with BOS token(s). We mask BOS in labels because it
+		# should not contribute to the supervised loss.
 		full_ids: List[int] = list(bos_token_ids)
 		full_labels: List[int] = [-100] * len(bos_token_ids)
 
@@ -193,6 +197,7 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 			segment_text = _render_turn_text(role, content)
 			segment_ids = tokenizer(segment_text, add_special_tokens=False)["input_ids"]
 			full_ids.extend(segment_ids)
+			# Train only on assistant turns; user/system tokens are masked with -100.
 			if role == "assistant":
 				full_labels.extend(segment_ids)
 			else:
@@ -204,6 +209,7 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 				print(f"Segment IDs: {segment_ids}")
 				print(f"Segment labels (should be {'non-100' if role == 'assistant' else '-100'}): {[full_labels[i] for i in range(len(full_labels)-len(segment_ids), len(full_labels))]}")
 
+		# Truncate sequence and labels together to keep index alignment.
 		full_ids = full_ids[:max_length]
 		full_labels = full_labels[:max_length]
 		attention_mask = [1] * len(full_ids)
@@ -227,6 +233,8 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 
 
 def collate_causal_lm(features: List[Dict[str, List[int]]], tokenizer: AutoTokenizer) -> Dict[str, torch.Tensor]:
+	# Dynamic padding per batch keeps compute efficient and preserves
+	# label masking for padded positions.
 	max_len = max(len(feature["input_ids"]) for feature in features)
 	pad_id = tokenizer.pad_token_id
 	if pad_id is None:
@@ -249,6 +257,7 @@ def collate_causal_lm(features: List[Dict[str, List[int]]], tokenizer: AutoToken
 
 		input_ids_batch.append(input_ids + [pad_id] * pad_len)
 		attention_mask_batch.append(attention_mask + [0] * pad_len)
+		# Pad labels with -100 so padded tokens are ignored by the loss.
 		labels_batch.append(labels + [-100] * pad_len)
 
 	return {
@@ -263,13 +272,13 @@ def main() -> None:
 
 	if not _has_accelerate():
 		raise RuntimeError("Missing dependency: accelerate. Install with `pip install accelerate`.")
-	if get_peft_model is None or LoraConfig is None or TaskType is None:
-		raise RuntimeError("Missing dependency: peft. Install with `pip install peft`.")
 
+	# Prepare tokenizer and ensure we have a valid pad token for batch collation.
 	tokenizer = AutoTokenizer.from_pretrained(args.model_name, use_fast=True)
 	if tokenizer.pad_token is None:
 		tokenizer.pad_token = tokenizer.eos_token
 
+	# Load either a local dataset file or a Hugging Face dataset split.
 	if args.data_path:
 		raw_dataset = _load_local_dataset(args.data_path, args.train_split)
 	else:
@@ -278,6 +287,7 @@ def main() -> None:
 	if args.max_train_samples is not None:
 		raw_dataset = raw_dataset.select(range(min(args.max_train_samples, len(raw_dataset))))
 
+	# Build normalized conversation examples and tokenize with selective labels.
 	text_dataset = build_text_dataset(raw_dataset, tokenizer)
 	tokenized_dataset = text_dataset.map(
 		lambda batch: tokenize_function(batch, tokenizer, args.max_seq_length),
@@ -285,6 +295,7 @@ def main() -> None:
 		remove_columns=["messages", "text"],
 	)
 
+	# Load base causal LM and configure it for training with padded batches.
 	model = AutoModelForCausalLM.from_pretrained(
 		args.model_name,
 		torch_dtype=torch.bfloat16,
@@ -292,6 +303,7 @@ def main() -> None:
 	model.config.pad_token_id = tokenizer.pad_token_id
 	model.config.use_cache = False
 
+	# Apply LoRA adapters so we only train a small subset of parameters.
 	lora_config = LoraConfig(
 		r=args.lora_r,
 		lora_alpha=args.lora_alpha,
@@ -304,6 +316,8 @@ def main() -> None:
 	if hasattr(model, "enable_input_require_grads"):
 		model.enable_input_require_grads()
 	else:
+		# Compatibility path for older model wrappers that need an embedding hook
+		# to enable gradient flow with gradient checkpointing-like setups.
 		def _set_require_grad(_module, _input, output):
 			output.requires_grad_(True)
 		model.get_input_embeddings().register_forward_hook(_set_require_grad)
@@ -316,6 +330,7 @@ def main() -> None:
 		)
 	model.print_trainable_parameters()
 
+	# Configure supervised fine-tuning hyperparameters.
 	training_args = TrainingArguments(
 		output_dir=args.output_dir,
 		learning_rate=args.learning_rate,
@@ -346,6 +361,7 @@ def main() -> None:
 		data_collator=data_collator,
 	)
 
+	# Run training and save both adapter/model state and tokenizer artifacts.
 	trainer.train()
 	trainer.save_model(args.output_dir)
 	tokenizer.save_pretrained(args.output_dir)

@@ -235,13 +235,28 @@ def main() -> None:
 
     do_sample = args.temperature > 0
     eos_token_ids = [tokenizer.eos_token_id]
+    
+    # Try to find <|eot_id|> token. First try direct token conversion, then try encoding.
     eot_token_ids = tokenizer.convert_tokens_to_ids(["<|eot_id|>"])
-    eot_token_id = eot_token_ids[0] if eot_token_ids else None
-    if eot_token_id is not None and eot_token_id not in eos_token_ids and eot_token_id != tokenizer.unk_token_id:
+    eot_token_id = None
+    
+    # Check if convert_tokens_to_ids returned a valid ID (not unk_token_id)
+    if eot_token_ids and eot_token_ids[0] != tokenizer.unk_token_id:
+        eot_token_id = eot_token_ids[0]
+    else:
+        # Fallback: try encoding the string directly
+        encoded = tokenizer.encode("<|eot_id|>", add_special_tokens=False)
+        if encoded and encoded[0] != tokenizer.unk_token_id:
+            eot_token_id = encoded[0]
+    
+    if eot_token_id is not None and eot_token_id not in eos_token_ids:
         eos_token_ids.append(eot_token_id)
         print(f"Added <|eot_id|> (token ID: {eot_token_id}) to eos_token_ids")
+    else:
+        print(f"Warning: Could not find valid <|eot_id|> token ID. eot_token_ids={eot_token_ids}")
 
     print(f"EOS token IDs: {eos_token_ids}")
+    print(f"tokenizer.eos_token_id: {tokenizer.eos_token_id} ({repr(tokenizer.eos_token)})")
 
     with torch.no_grad():
         output_ids = model.generate(
@@ -258,6 +273,23 @@ def main() -> None:
 
     continuation_ids = output_ids[0][input_ids.shape[1]:]
     generated_text = tokenizer.decode(continuation_ids, skip_special_tokens=True).strip()
+    
+    # Debug: check what token stopped the generation
+    print("\n=== Generation Debug ===")
+    print(f"Total output length: {len(output_ids[0])}")
+    print(f"Input length: {input_ids.shape[1]}")
+    print(f"Generated tokens: {len(continuation_ids)}")
+    if len(continuation_ids) > 0:
+        last_token_id = continuation_ids[-1].item() if hasattr(continuation_ids[-1], 'item') else continuation_ids[-1]
+        last_token_text = tokenizer.decode([last_token_id])
+        print(f"Last generated token ID: {last_token_id} ({repr(last_token_text)})")
+        if last_token_id in eos_token_ids:
+            print(f"✓ Stopped at EOS token (as expected)")
+        elif len(continuation_ids) >= args.max_new_tokens:
+            print(f"⚠ Hit max_new_tokens limit ({args.max_new_tokens}), did NOT hit EOS token")
+        else:
+            print(f"⚠ Unexpected stop condition")
+    
     generated_text = _truncate_generated_text(generated_text)
 
     print("=== Prompt ===")
