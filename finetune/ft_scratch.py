@@ -1,4 +1,8 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+try:
+    from transformers import clone_chat_template
+except ImportError:
+    from transformers.utils import clone_chat_template
 from datasets import load_dataset
 from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer, SFTConfig
@@ -27,9 +31,13 @@ def main():
         "meta-llama/Meta-Llama-3-8B",
         quantization_config=bnb_config,
         torch_dtype=torch.bfloat16,
-        trust_remote_code=True,
     )
-    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B", trust_remote_code=True)
+    tokenizer = AutoTokenizer.from_pretrained("meta-llama/Meta-Llama-3-8B")
+    model, tokenizer, added_tokens = clone_chat_template(
+        model,
+        tokenizer,
+        source_tokenizer_path="meta-llama/Meta-Llama-3-8B-Instruct",
+    )
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
 
