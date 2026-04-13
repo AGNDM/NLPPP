@@ -109,7 +109,7 @@ def main():
         r=16, lora_alpha=32, lora_dropout=0.05,
         bias="none", task_type="CAUSAL_LM",
         target_modules=['up_proj','down_proj','gate_proj','k_proj','q_proj','v_proj','o_proj'],
-        modules_to_save=["embed_tokens", "lm_head"]
+#        modules_to_save=["embed_tokens", "lm_head"]
     )
     print("Loading and setting up Dataset for Training")
     # Dataset prep
