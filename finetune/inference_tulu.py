@@ -235,7 +235,8 @@ def main() -> None:
 
     do_sample = args.temperature > 0
     eos_token_ids = [tokenizer.eos_token_id]
-    eot_token_id = tokenizer.convert_token_to_id("<|eot_id|>")
+    eot_token_ids = tokenizer.convert_tokens_to_ids(["<|eot_id|>"])
+    eot_token_id = eot_token_ids[0] if eot_token_ids else None
     if eot_token_id is not None and eot_token_id not in eos_token_ids and eot_token_id != tokenizer.unk_token_id:
         eos_token_ids.append(eot_token_id)
         print(f"Added <|eot_id|> (token ID: {eot_token_id}) to eos_token_ids")
