@@ -61,6 +61,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--top_p", type=float, default=0.9)
     parser.add_argument("--repetition_penalty", type=float, default=1.0)
+    parser.add_argument("--num_beams", type=int, default=1, help="Number of beams for beam search (1=greedy)")
+    parser.add_argument("--early_stopping", action="store_true", help="Stop beam search when any beam hits EOS")
     parser.add_argument("--seed", type=int, default=42)
     return parser.parse_args()
 
@@ -116,6 +118,7 @@ def _render_chat_text(messages: List[Dict[str, str]], tokenizer: AutoTokenizer) 
             role = "user"
         parts.append(f"<|start_header_id|>{role}<|end_header_id|>\n\n{content}<|eot_id|>")
 
+    # Prompt for assistant turn: format it exactly like training data format
     parts.append("<|start_header_id|>assistant<|end_header_id|>\n\n")
     return "".join(parts)
 
@@ -233,9 +236,7 @@ def main() -> None:
     input_ids = inputs["input_ids"].to(device)
     attention_mask = inputs["attention_mask"].to(device)
 
-    do_sample = args.temperature > 0
-    
-    # For Llama-3-Chat format, <|eot_id|> is the primary conversation end marker.
+    # Configure EOS tokens for stopping generation
     # Try to find it first, then fall back to the tokenizer's eos_token_id.
     eot_token_ids = tokenizer.convert_tokens_to_ids(["<|eot_id|>"])
     eot_token_id = None
@@ -270,11 +271,13 @@ def main() -> None:
             input_ids=input_ids,
             attention_mask=attention_mask,
             max_new_tokens=args.max_new_tokens,
-            do_sample=do_sample,
-            temperature=args.temperature if do_sample else None,
-            top_p=args.top_p if do_sample else None,
+            num_beams=args.num_beams,
+            early_stopping=args.early_stopping,
+            do_sample=args.temperature > 0,
+            temperature=args.temperature if args.temperature > 0 else None,
+            top_p=args.top_p if args.temperature > 0 else None,
             repetition_penalty=args.repetition_penalty,
-            eos_token_id=eos_token_ids,  # Pass list of all EOS tokens
+            eos_token_id=eos_token_ids,
             pad_token_id=tokenizer.pad_token_id,
         )
 
