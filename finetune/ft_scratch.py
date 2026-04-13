@@ -89,7 +89,8 @@ def main():
         )
         return r
 
-    ds = ds.map(fmt, num_proc=4)
+    original_columns = ds.column_names
+    ds = ds.map(fmt, num_proc=4, remove_columns=original_columns)
     ds = ds.train_test_split(test_size=0.01, seed=42)
 
     # SFT Trainer (compatible across TRL/Transformers versions)
@@ -133,13 +134,20 @@ def main():
     sft_kwargs = {key: value for key, value in sft_kwargs.items() if key in sft_init_params}
     sft_config = SFTConfig(**sft_kwargs)
 
-    trainer = SFTTrainer(
-        model=model,
-        train_dataset=ds["train"],
-        eval_dataset=ds["test"],
-        peft_config=peft_config,
-        args=sft_config,
-    )
+    trainer_kwargs = {
+        "model": model,
+        "train_dataset": ds["train"],
+        "eval_dataset": ds["test"],
+        "peft_config": peft_config,
+        "args": sft_config,
+    }
+    sft_trainer_init_params = inspect.signature(SFTTrainer.__init__).parameters
+    if "tokenizer" in sft_trainer_init_params:
+        trainer_kwargs["tokenizer"] = tokenizer
+    elif "processing_class" in sft_trainer_init_params:
+        trainer_kwargs["processing_class"] = tokenizer
+
+    trainer = SFTTrainer(**trainer_kwargs)
 
     print("Starting Training :")
     trainer.train()
