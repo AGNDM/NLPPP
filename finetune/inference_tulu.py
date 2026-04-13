@@ -282,6 +282,9 @@ def main() -> None:
         )
 
     continuation_ids = output_ids[0][input_ids.shape[1]:]
+    
+    # Decode with special_tokens to see if model actually generated EOS
+    generated_text_with_special = tokenizer.decode(continuation_ids, skip_special_tokens=False).strip()
     generated_text = tokenizer.decode(continuation_ids, skip_special_tokens=True).strip()
     
     # Debug: check what token stopped the generation
@@ -292,7 +295,7 @@ def main() -> None:
     
     # Check if any of the generated tokens are in eos_token_ids
     eot_appearances = sum(1 for tid in continuation_ids if tid in eos_token_ids)
-    print(f"EOS tokens in generated sequence: {eot_appearances}")
+    print(f"EOS tokens (128001, 128009) in generated sequence: {eot_appearances}")
     
     if len(continuation_ids) > 0:
         last_token_id = continuation_ids[-1].item() if hasattr(continuation_ids[-1], 'item') else continuation_ids[-1]
@@ -314,7 +317,12 @@ def main() -> None:
         else:
             print(f"⚠ Unexpected stop condition")
     
+    # Clean up special tokens for display
     generated_text = _truncate_generated_text(generated_text)
+    
+    # Also show decoded text with special tokens visible for debugging
+    print(f"\n=== Generated (with special tokens visible) ===")
+    print(repr(generated_text_with_special))
 
     print("=== Prompt ===")
     print(json.dumps(messages, ensure_ascii=False, indent=2))

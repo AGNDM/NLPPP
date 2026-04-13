@@ -190,8 +190,11 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 		if debug_count < 2:
 			print(f"\n=== DEBUG Sample {debug_count} ===")
 			print(f"EOT token IDs: {eot_ids}")
-			print(f"Number of chat turns: {len(messages)}")
+			print(f"Original number of chat turns: {len(messages)}")
 
+		# Track if we've seen an assistant turn (to decide if we should continue)
+		seen_assistant_turn = False
+		
 		for turn_idx, turn in enumerate(messages):
 			if not isinstance(turn, dict):
 				continue
@@ -200,12 +203,21 @@ def tokenize_function(examples: Dict[str, List[Any]], tokenizer: AutoTokenizer, 
 			if not content:
 				continue
 
+			# If we already saw an assistant turn and now see another turn,
+			# it means we have multi-turn dialogue. For safety, truncate here
+			# to force model to learn single-turn completion with <|eot_id|>.
+			if seen_assistant_turn and role != "assistant":
+				if debug_count < 2:
+					print(f"  → Truncating at turn {turn_idx}: saw assistant turn, now seeing {role} turn")
+				break
+
 			segment_text = _render_turn_text(role, content)
 			segment_ids = tokenizer(segment_text, add_special_tokens=False)["input_ids"]
 			full_ids.extend(segment_ids)
 			# Train only on assistant turns; user/system tokens are masked with -100.
 			if role == "assistant":
 				full_labels.extend(segment_ids)
+				seen_assistant_turn = True
 			else:
 				full_labels.extend([-100] * len(segment_ids))
 
