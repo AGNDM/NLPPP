@@ -5,7 +5,7 @@ from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
 import os
 import torch
-from state import RAGState
+from pipeline.state import RAGState
 import json
 
 load_dotenv()  # load .env 
@@ -48,12 +48,12 @@ def query_vector_trunks(state:RAGState):
         query=query_vector.tolist(),
         limit=3,
         with_payload=True,  # Include paper metadata
-        with_vectors=False
+        with_vectors=True
     ).points
 
-    json_data = qdrant_results_to_json(results)
+    # json_data = qdrant_results_to_json(results)
 
     return {
-        "retrieved_chunks": json_data
+        "retrieved_chunks": results
     }
 

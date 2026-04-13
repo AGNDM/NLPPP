@@ -1,8 +1,16 @@
 from langgraph.graph import StateGraph, START, END
-from rewrite import query_rewrite
-from state import RAGState
-from rag import query_vector_trunks
-from nli import nli_detect
+from pipeline.rewrite import query_rewrite
+from pipeline.state import RAGState
+from pipeline.rag import query_vector_trunks
+from pipeline.nli import nli_detect
+
+# import sys
+# from pathlib import Path
+
+# # 自动定位到项目根目录 NLPPP，并加入 sys.path
+# project_root = Path(__file__).parent.parent  # main.py → langgraph → NLPPP
+# sys.path.append(str(project_root))
+
 
 
 # ===================== 5. 生成最终回答（需要拼接数据结构） =====================

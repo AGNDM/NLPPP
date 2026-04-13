@@ -1,7 +1,7 @@
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
-from state import RAGState
+from pipeline.state import RAGState
 
 load_dotenv()  # load .env 
 
