@@ -5,6 +5,7 @@ from trl import SFTTrainer, SFTConfig, clone_chat_template
 import torch
 import json
 import os
+import inspect
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -71,32 +72,46 @@ def main():
     ds = ds.map(fmt, num_proc=4)
     ds = ds.train_test_split(test_size=0.01, seed=42)
 
-    # SFT Trainer
-    sft_config = SFTConfig(
-        output_dir=run_output_dir,
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
-        gradient_accumulation_steps=1,
-        disable_tqdm=False,
-        optim="paged_adamw_32bit",
-        num_train_epochs=3,
-        eval_strategy="steps",
-        eval_steps=100,
-        logging_steps=10,
-        warmup_steps=50,
-        logging_strategy="steps",
-        learning_rate=2e-4,
-        fp16=False, bf16=True,
-        gradient_checkpointing=True,
-        group_by_length=True,
-        dataloader_num_workers=4,
-        dataset_text_field="text",
-        max_length=512,
-        packing=False,
-        save_strategy="steps",
-        save_steps=1000,
-        save_total_limit=10,
-    )
+    # SFT Trainer (compatible across TRL/Transformers versions)
+    sft_kwargs = {
+        "output_dir": run_output_dir,
+        "per_device_train_batch_size": 4,
+        "per_device_eval_batch_size": 4,
+        "gradient_accumulation_steps": 1,
+        "disable_tqdm": False,
+        "optim": "paged_adamw_32bit",
+        "num_train_epochs": 3,
+        "eval_steps": 100,
+        "logging_steps": 10,
+        "warmup_steps": 50,
+        "logging_strategy": "steps",
+        "learning_rate": 2e-4,
+        "fp16": False,
+        "bf16": True,
+        "gradient_checkpointing": True,
+        "group_by_length": True,
+        "dataloader_num_workers": 4,
+        "dataset_text_field": "text",
+        "packing": False,
+        "save_strategy": "steps",
+        "save_steps": 1000,
+        "save_total_limit": 10,
+    }
+
+    sft_init_params = inspect.signature(SFTConfig.__init__).parameters
+    strategy_value = "steps"
+    if "evaluation_strategy" in sft_init_params:
+        sft_kwargs["evaluation_strategy"] = strategy_value
+    elif "eval_strategy" in sft_init_params:
+        sft_kwargs["eval_strategy"] = strategy_value
+
+    if "max_length" in sft_init_params:
+        sft_kwargs["max_length"] = 512
+    elif "max_seq_length" in sft_init_params:
+        sft_kwargs["max_seq_length"] = 512
+
+    sft_kwargs = {key: value for key, value in sft_kwargs.items() if key in sft_init_params}
+    sft_config = SFTConfig(**sft_kwargs)
 
     trainer = SFTTrainer(
         model=model,
