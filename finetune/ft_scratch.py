@@ -67,7 +67,6 @@ def main():
 
 
     print(f"chat_template ready: {bool(tokenizer.chat_template)}")
-    print(f"tokens added by clone_chat_template: {added_token_count}")
 
     if tokenizer.pad_token is None:
         # Prefer using Llama 3's built-in tokens to avoid resizing embeddings
