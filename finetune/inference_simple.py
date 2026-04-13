@@ -106,7 +106,7 @@ def main() -> None:
 
 	prompt_len = inputs["input_ids"].shape[-1]
 	new_token_ids = generated_ids[0][prompt_len:]
-	output_text = tokenizer.decode(new_token_ids, skip_special_tokens=True).strip()
+	output_text = tokenizer.decode(new_token_ids, skip_special_tokens=False).strip()
 
 	print(f"{assistant_prefix}{output_text}")
 
