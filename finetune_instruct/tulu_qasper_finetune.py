@@ -6,7 +6,7 @@ from transformers import (
     TrainingArguments,
 )
 from peft import LoraConfig, get_peft_model
-from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
+from trl import SFTTrainer, SFTConfig, DataCollatorForCompletionOnlyLM
 
 def main():
     # 1. Load Dataset
@@ -38,7 +38,7 @@ def main():
     print("Formatting dataset with chat template...")
     def create_prompt(example):
         messages = [
-            {"role": "user", "content": example["input"]},
+            {"role": "user", "content": str(example["input"])},
             {"role": "assistant", "content": example["answer"]}
         ]
         # Use Tulu 3's built-in chat template to format the conversation properly
@@ -58,7 +58,7 @@ def main():
     )
 
     # 4. Training Arguments
-    training_args = TrainingArguments(
+    training_args = SFTConfig(
         output_dir="./tulu_qasper_lora_output",
         per_device_train_batch_size=8, # GH200 has 96GB/144GB VRAM, can use a larger batch size
         gradient_accumulation_steps=1, # Adjust if you want larger effective batch size
@@ -70,7 +70,9 @@ def main():
         report_to="none", # Switch to "wandb" or "tensorboard" if you use them
         remove_unused_columns=False,
         ddp_find_unused_parameters=False, # Required for LoRA training with DDP
-        gradient_checkpointing=True # Save memory for large models
+        gradient_checkpointing=True, # Save memory for large models
+        dataset_text_field="text",
+        max_seq_length=2048,
     )
 
     # 5. Initialize SFTTrainer
@@ -84,8 +86,6 @@ def main():
         model=model,
         train_dataset=dataset,
         peft_config=lora_config,
-        dataset_text_field="text", # Using the newly created text column
-        max_seq_length=2048,
         tokenizer=tokenizer,
         args=training_args,
         data_collator=collator, # Apply completion-only loss
