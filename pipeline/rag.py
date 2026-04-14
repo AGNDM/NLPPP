@@ -6,6 +6,7 @@ from adapters import AutoAdapterModel
 import os
 import torch
 from pipeline.state import RAGState
+from pipeline.constant import RETRIEVAL_MODLE_NAME, RETRIEVAL_ADAPTER_NAME, RETRIEVAL_COLLECTION_NAME, RETRIEVAL_TOP_K
 import json
 
 load_dotenv()  # load .env 
@@ -13,14 +14,11 @@ load_dotenv()  # load .env
 # init Qdrant client
 qdrant_client = QdrantClient(url=os.getenv("QDRANT_URL"), api_key=os.getenv("QDRANT_API_KEY"))
 
-COLLECTION_NAME = "nlp_papers"
-TOP_K = 5
-
 def create_embedding_model():
-    model_name = "allenai/specter2_base"
+    model_name = RETRIEVAL_MODLE_NAME
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     embedding_model = AutoAdapterModel.from_pretrained(model_name)
-    embedding_model.load_adapter("allenai/specter2", source="hf", load_as="specter2", set_active=True)
+    embedding_model.load_adapter(RETRIEVAL_ADAPTER_NAME, source="hf", load_as="specter2", set_active=True)
     return tokenizer, embedding_model
 
 def text_to_embedding(text):
@@ -44,9 +42,9 @@ def qdrant_results_to_json(results):
 def query_vector_trunks(state:RAGState):
     query_vector = text_to_embedding(state["rewritten_query"])
     results = qdrant_client.query_points(
-        collection_name='nlp_papers',
+        collection_name=RETRIEVAL_COLLECTION_NAME,
         query=query_vector.tolist(),
-        limit=3,
+        limit=RETRIEVAL_TOP_K,
         with_payload=True,  # Include paper metadata
         with_vectors=True
     ).points

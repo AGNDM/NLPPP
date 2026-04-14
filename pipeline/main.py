@@ -4,14 +4,14 @@ from pipeline.state import RAGState
 from pipeline.rag import query_vector_trunks
 from pipeline.nli import nli_detect
 
-# import sys
-# from pathlib import Path
+def restart(state: RAGState):
+    return "wait_user_input"
 
-# # 自动定位到项目根目录 NLPPP，并加入 sys.path
-# project_root = Path(__file__).parent.parent  # main.py → langgraph → NLPPP
-# sys.path.append(str(project_root))
-
-
+def wait_user_input(state: RAGState):
+    user_input = input("\n👉 please input your question: ")
+    return {
+        "original_query": user_input
+    }
 
 # ===================== 5. 生成最终回答（需要拼接数据结构） =====================
 # def generate_answer_node(state: RAGState) -> dict:
@@ -49,16 +49,18 @@ from pipeline.nli import nli_detect
 graph = StateGraph(RAGState)
 
 # add nodes
+graph.add_node("wait_user_input", wait_user_input)
 graph.add_node("query_rewrite", query_rewrite)
 graph.add_node("get_retrived_trunks", query_vector_trunks)
 graph.add_node("contradict_detect", nli_detect)
 
 # START → rewrite → retrive → NLI → generate answer → END
-graph.add_edge(START, "query_rewrite")
+graph.add_edge(START, "wait_user_input")
+graph.add_edge("wait_user_input", "query_rewrite")
 graph.add_edge("query_rewrite", "get_retrived_trunks")
 graph.add_edge("get_retrived_trunks", "contradict_detect")
 # graph.add_edge("retrieve", "generate_answer")
-# graph.add_edge("generate_answer", END)
+# graph.add_conditional_edges("contradict_detect", restart)
 
 # compile
 app = graph.compile()
@@ -68,11 +70,11 @@ app = graph.compile()
 if __name__ == "__main__":
     pass
     # user input
-    user_query = "attention ? "
+    # user_query = input("\n👉 please input your question: ")
 
     # initial state
     initial_state = {
-        "original_query": user_query,
+        "original_query": "",
         "rewritten_query": "",
         "retrieved_chunks": []
     }

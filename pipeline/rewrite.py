@@ -2,6 +2,7 @@ from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
 from pipeline.state import RAGState
+from pipeline.constant import REWRITE_MODEL_NAME
 
 load_dotenv()  # load .env 
 
@@ -9,7 +10,7 @@ load_dotenv()  # load .env
 OraAgent = ChatOpenAI(
   base_url="https://openrouter.ai/api/v1",
   api_key=os.getenv("OPENAI_API_KEY"),
-  model="deepseek/deepseek-chat", 
+  model=REWRITE_MODEL_NAME, 
   temperature=0
 )
 
@@ -34,8 +35,6 @@ Rewritten query:
     # call Organisation Agent
     response = OraAgent.invoke(rewrite_prompt)
     rewritten_query = response.content.strip()
-
-    print('rewritten_query', rewritten_query)
 
     print(f"\n✅ raw query：{original_query}")
     print(f"✅ rewritten query：{rewritten_query}")
