@@ -93,7 +93,9 @@ def main():
 
     # 6. Start Training
     print("Starting training...")
-    print(collator([dataset[0]])["labels"][0])
+    # Preview the tokenized dataset's first example locally on rank 0
+    if local_rank == 0:
+        print("First example labels:", collator([trainer.train_dataset[0]])["labels"][0])
     trainer.train()
 
     # 7. Save the final model
