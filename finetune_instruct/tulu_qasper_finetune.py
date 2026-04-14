@@ -6,7 +6,7 @@ from transformers import (
     TrainingArguments,
 )
 from peft import LoraConfig, get_peft_model
-from trl import SFTTrainer
+from trl import SFTTrainer, DataCollatorForCompletionOnlyLM
 
 def main():
     # 1. Load Dataset
@@ -45,7 +45,7 @@ def main():
         text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
         return {"text": text}
 
-    dataset = dataset.map(create_prompt)
+    dataset = dataset.map(create_prompt, remove_columns=dataset.column_names)
 
     # 3. LoRA Configuration
     lora_config = LoraConfig(
@@ -73,6 +73,12 @@ def main():
     )
 
     # 5. Initialize SFTTrainer
+    print("Setting up DataCollatorForCompletionOnlyLM...")
+    # Tulu 3 / Llama 3 chat format uses a specific tag before the assistant's reply.
+    # We find this exact token sequence so the loss is ignored for the prompt.
+    response_template = "<|start_header_id|>assistant<|end_header_id|>\n\n"
+    collator = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
+
     trainer = SFTTrainer(
         model=model,
         train_dataset=dataset,
@@ -81,6 +87,7 @@ def main():
         max_seq_length=2048,
         tokenizer=tokenizer,
         args=training_args,
+        data_collator=collator, # Apply completion-only loss
     )
 
     # 6. Start Training
