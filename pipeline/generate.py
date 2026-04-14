@@ -74,7 +74,7 @@ def generate_answer_node(state: RAGState) -> dict:
     #Question\n{rewritten_query}\n\n#Context\n{nli_pairs}\n\n#Abstract\n{abstracts}\n\n"""
 
     base_model_id = "allenai/Llama-3.1-Tulu-3-8B"
-    peft_model_id = "./tulu_qasper_lora_final"
+    peft_model_id = "AGNDM/tulu_qasper_lora_final"
     
     model, tokenizer = load_model_and_tokenizer(base_model_id, peft_model_id)
     print("\nModel loaded successfully! Enter your prompt below (or 'quit' to exit).")
