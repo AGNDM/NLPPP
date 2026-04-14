@@ -71,7 +71,7 @@ def generate_answer_node(state: RAGState) -> dict:
     abstracts = "\n".join([f"[{i+1}] {chunk.payload["abstract"]}"  for i, chunk in enumerate(retrieved_chunks)])
 
     user_prompt = f"""
-    #Question\n {rewritten_query} \n\n  #Context \n {nli_pairs}\n\n #Abstract \n {abstracts} \n\n"""
+    #Question\n{rewritten_query}\n\n#Context\n{nli_pairs}\n\n#Abstract\n{abstracts}\n\n"""
 
     base_model_id = "allenai/Llama-3.1-Tulu-3-8B"
     peft_model_id = "./tulu_qasper_lora_final"
