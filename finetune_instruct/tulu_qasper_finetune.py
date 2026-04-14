@@ -70,14 +70,15 @@ def main():
         report_to="none", # Switch to "wandb" or "tensorboard" if you use them
         remove_unused_columns=False,
         ddp_find_unused_parameters=False, # Required for LoRA training with DDP
+        gradient_checkpointing=True # Save memory for large models
     )
 
     # 5. Initialize SFTTrainer
     print("Setting up DataCollatorForCompletionOnlyLM...")
     # Tulu 3 / Llama 3 chat format uses a specific tag before the assistant's reply.
-    # We find this exact token sequence so the loss is ignored for the prompt.
-    response_template = "<|start_header_id|>assistant<|end_header_id|>\n\n"
-    collator = DataCollatorForCompletionOnlyLM(response_template, tokenizer=tokenizer)
+    response_template_str = "<|assistant|>\n"
+    response_template_ids = tokenizer.encode(response_template_str, add_special_tokens=False)
+    collator = DataCollatorForCompletionOnlyLM(response_template_ids, tokenizer=tokenizer)
 
     trainer = SFTTrainer(
         model=model,
@@ -92,6 +93,7 @@ def main():
 
     # 6. Start Training
     print("Starting training...")
+    print(collator([dataset[0]])["labels"][0])
     trainer.train()
 
     # 7. Save the final model
