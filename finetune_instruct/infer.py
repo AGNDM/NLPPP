@@ -50,7 +50,7 @@ def generate_answer(model, tokenizer, prompt, max_new_tokens=512):
 
 if __name__ == "__main__":
     base_model_id = "allenai/Llama-3.1-Tulu-3-8B"
-    peft_model_id = "/iopsstor/scratch/cscs/tong/share/xianrong_liu/tutorial_NLPPP/tulu_qasper_lora_final"
+    peft_model_id = "$SCRATCH/share/xianrong_liu/tutorial_NLPPP/tulu_qasper_lora_final"
     
     model, tokenizer = load_model_and_tokenizer(base_model_id, peft_model_id)
     
