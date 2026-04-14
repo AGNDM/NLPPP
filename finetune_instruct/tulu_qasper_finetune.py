@@ -35,7 +35,7 @@ def main():
     )
 
     # Convert the dataset to the model's chat format
-    print("Formatting dataset with chat template...")
+    print("Formatting dataset with chat template and tokenizing...")
     def create_prompt(example):
         messages = [
             {"role": "user", "content": str(example["input"])},
@@ -43,7 +43,8 @@ def main():
         ]
         # Use Tulu 3's built-in chat template to format the conversation properly
         text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=False)
-        return {"text": text}
+        # Tokenize the generated text directly
+        return tokenizer(text, truncation=True, max_length=2048)
 
     dataset = dataset.map(create_prompt, remove_columns=dataset.column_names)
 
@@ -68,11 +69,11 @@ def main():
         save_strategy="epoch",
         bf16=True, # GH200 supports bfloat16 perfectly
         report_to="none", # Switch to "wandb" or "tensorboard" if you use them
-        remove_unused_columns=False,
+        remove_unused_columns=True, # Remove unused string columns like "text" to avoid collation errors
         ddp_find_unused_parameters=False, # Required for LoRA training with DDP
         gradient_checkpointing=True, # Save memory for large models
-        dataset_text_field="text",
         max_seq_length=2048,
+        dataset_kwargs={"skip_prepare_dataset": True}, # Skip SFTTrainer's internal formatting to use pre-tokenized data
     )
 
     # 5. Initialize SFTTrainer
