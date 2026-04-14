@@ -5,3 +5,4 @@ class RAGState(TypedDict):
     rewritten_query: str                    
     retrieved_chunks:list
     nli_pairs: list
+    answer: str

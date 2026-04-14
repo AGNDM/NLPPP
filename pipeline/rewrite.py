@@ -10,7 +10,7 @@ load_dotenv()  # load .env
 OraAgent = ChatOpenAI(
   base_url="https://openrouter.ai/api/v1",
   api_key=os.getenv("OPENAI_API_KEY"),
-  model=REWRITE_MODEL_NAME, 
+  model="deepseek/deepseek-chat", 
   temperature=0
 )
 
