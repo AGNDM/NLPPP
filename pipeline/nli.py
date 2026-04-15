@@ -6,6 +6,10 @@ from pipeline.constants import NLI_MODEL
 
 def detect_contradictions_node(state: RAGState) -> dict:
     """LangGraph node: detects contradictions among retrieved chunks."""
+    #Skip contradiction detection if fewer than 2 chunks were retrieved
+    if len(state["retrieved_chunks"]) < 2:
+        return {"contradiction_pairs": []}
+    
     contradiction_pairs = detect_contradictions(state["retrieved_chunks"], NLI_MODEL)
 
     if contradiction_pairs:

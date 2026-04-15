@@ -48,7 +48,7 @@ def _load_model():
     print(f"[generate] attaching LoRA adapter: {GENERATE_LORA_ADAPTER}")
     
     if USE_LORA:
-        base_model = PeftModel.from_pretrained(base_model, GENERATE_LORA_ADAPTER)
+        model = PeftModel.from_pretrained(base_model, GENERATE_LORA_ADAPTER)
     else:
         model = base_model
 

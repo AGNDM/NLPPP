@@ -13,4 +13,4 @@ NLI_SIMILARITY_THRESHOLD = 0.65  # cosine similarity cutoff before running NLI
 # TODO: replace with fine-tuned Llama once ready (and update generate.py to load locally)
 GENERATE_BASE_MODEL = "allenai/Llama-3.1-Tulu-3-8B"
 GENERATE_LORA_ADAPTER = "AGNDM/tulu_qasper_lora_final"
-USE_LORA = False  # set to True to use the LoRA adapter (currently disabled for testing without adapter)
+USE_LORA = True  # set to True to use the LoRA adapter (currently disabled for testing without adapter)
