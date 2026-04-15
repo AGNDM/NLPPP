@@ -5,7 +5,7 @@ from pipeline.state import RAGState
 from pipeline.constant import GENERATE_MODLE_NAME
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-# from peft import PeftModel
+from peft import PeftModel
 
 def load_model_and_tokenizer(base_model_id, peft_model_id):
     bnb_config = BitsAndBytesConfig(
@@ -14,7 +14,6 @@ def load_model_and_tokenizer(base_model_id, peft_model_id):
         bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.bfloat16
     )
-    print("Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(base_model_id)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -23,13 +22,11 @@ def load_model_and_tokenizer(base_model_id, peft_model_id):
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_id,
         device_map="auto",
-        quantization_config=bnb_config,
         torch_dtype=torch.bfloat16,
     )
     
-    # print(f"Loading LoRA weights from {peft_model_id}...")
-    model = base_model
-    # model = PeftModel.from_pretrained(base_model, peft_model_id)
+    print(f"Loading LoRA weights from {peft_model_id}...")
+    model = PeftModel.from_pretrained(base_model, peft_model_id)
     model.eval()
     return model, tokenizer
 
@@ -85,5 +82,5 @@ def generate_answer_node(state: RAGState) -> dict:
     print(answer)
 
     return {
-        "answer": "answer"
+        "answer": answer
     }

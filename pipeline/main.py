@@ -14,37 +14,6 @@ def wait_user_input(state: RAGState):
         "original_query": user_input
     }
 
-# ===================== 5. 生成最终回答（需要拼接数据结构） =====================
-# def generate_answer_node(state: RAGState) -> dict:
-#     """用检索到的上下文 + 重写后的查询，生成最终回答"""
-#     rewritten_query = state["rewritten_query"]
-#     retrieved_chunks = state["retrieved_chunks"]
-
-#     # 拼接上下文
-#     context = "\n\n".join([f"【上下文 {i+1}】{chunk}" for i, chunk in enumerate(retrieved_chunks)])
-
-#     # 回答提示词
-#     answer_prompt = f"""
-# 你是一个专业的问答助手，请根据以下提供的上下文，回答用户的问题。
-# 要求：
-# 1.  只使用上下文里的信息，不要编造
-# 2.  回答清晰、准确、有条理
-# 3.  如果上下文里没有答案，直接说明“无法根据现有信息回答”
-
-# 上下文：
-# {context}
-
-# 用户问题：{rewritten_query}
-# 回答：
-# """
-
-#     response = llm.invoke(answer_prompt)
-#     final_answer = response.content.strip()
-
-#     return {
-#         "messages": state["messages"] + [{"role": "assistant", "content": final_answer}]
-#     }
-
 
 # ===================== 6.  LangGraph workflow =====================
 graph = StateGraph(RAGState)
