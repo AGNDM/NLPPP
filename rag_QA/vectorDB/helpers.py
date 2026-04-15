@@ -28,9 +28,9 @@ def load_embedding_model() -> tuple[AutoTokenizer, AutoAdapterModel]:
     print("  → Model ready\n")
     return tokenizer, model
 
-# ── Embedding helper ──────────────────────────────────────────────────────────
+# ── Document Embedding helper ──────────────────────────────────────────────────────────
 
-def embed(texts: list[str], tokenizer: AutoTokenizer, model: AutoAdapterModel) -> np.ndarray:
+def embed_document(texts: list[str], tokenizer: AutoTokenizer, model: AutoAdapterModel) -> np.ndarray:
     """Convert a list(!) of texts to SPECTER 2 embeddings.
 
     Args:
@@ -54,6 +54,45 @@ def embed(texts: list[str], tokenizer: AutoTokenizer, model: AutoAdapterModel) -
         output = model(**inputs)
     # The embedding is the first token ([CLS]) of the last hidden state
     return output.last_hidden_state[:, 0, :].numpy()
+
+# ── Query Embedding helper ─────────────────────────────────────────────────────────
+
+def load_query_model() -> tuple[AutoTokenizer, AutoAdapterModel]:
+    """Load SPECTER2 with the adhoc_query adapter for embedding user queries.
+    
+    This is intentionally separate from load_embedding_model() — documents and
+    queries need different adapters for asymmetric retrieval to work correctly.
+    """
+    print("Loading SPECTER2 query model...")
+    tokenizer = AutoTokenizer.from_pretrained("allenai/specter2_base")
+    model = AutoAdapterModel.from_pretrained("allenai/specter2_base")
+    model.load_adapter("allenai/specter2_adhoc_query", source="hf", load_as="adhoc_query", set_active=True)
+    model.eval()
+    print("  → Query model ready\n")
+    return tokenizer, model
+
+
+def embed_query(text: str, tokenizer: AutoTokenizer, model: AutoAdapterModel) -> np.ndarray:
+    """Embed a single user query using the adhoc_query adapter.
+
+    Args:
+        text (str): The user's (rewritten) query string.
+        tokenizer (AutoTokenizer): The SPECTER2 query tokenizer.
+        model (AutoAdapterModel): The SPECTER2 model with adhoc_query adapter.
+
+    Returns:
+        np.ndarray: A 1D embedding vector.
+    """
+    inputs = tokenizer(
+        text,
+        truncation=True,
+        max_length=512,
+        return_tensors="pt",
+        return_token_type_ids=False,
+    )
+    with torch.no_grad():
+        output = model(**inputs)
+    return output.last_hidden_state[:, 0, :].numpy().flatten()
 
 # ── Connect to Qdrant ─────────────────────────────────────────────────────────
 

@@ -1,1 +1,1 @@
-from nli import detect_contradictions
+from .nli import detect_contradictions

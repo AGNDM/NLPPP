@@ -1,5 +1,5 @@
 import os
-from helpers import QDRANT_API_KEY, load_embedding_model, embed, get_qdrant_client, query_vector_db
+from helpers import QDRANT_API_KEY, load_embedding_model, embed_document, get_qdrant_client, query_vector_db
 
 COLLECTION_NAME = "nlp_papers"
 
@@ -17,7 +17,7 @@ user_query = "Improve efficiency of attention mechanisms in transformer models"
 print(f"\nSearching for papers similar to: '{user_query}'...\n")
 
 # Embed the query
-query_embedding = embed([user_query], tokenizer, model)[0] # Note how we turn the user query into a list of one item
+query_embedding = embed_document([user_query], tokenizer, model)[0] # Note how we turn the user query into a list of one item
 
 # Query the vector database
 results = query_vector_db(client, query_embedding, collection_name=COLLECTION_NAME) # defaults to top_k=3

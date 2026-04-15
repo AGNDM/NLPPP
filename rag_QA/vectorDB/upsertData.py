@@ -4,7 +4,7 @@ import os
 import uuid
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
-from helpers import load_embedding_model, embed, get_qdrant_client
+from helpers import load_embedding_model, embed_document, get_qdrant_client
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -20,7 +20,7 @@ print("Loading papers from", PAPERS_FILE)
 with open(PAPERS_FILE, "r") as f:
     papers = json.load(f)
 
-# Drop papers with no abstract — can't embed them
+# Drop papers with no abstract — can't embed_document them
 papers = [p for p in papers if p.get("abstract")]
 print(f"  → {len(papers)} papers with abstracts found\n")
 
@@ -55,11 +55,11 @@ for batch_index in range(total_batches):
 
     print(f"Batch {batch_index + 1}/{total_batches}  (papers {start + 1}–{min(end, len(papers))})")
 
-    # --- Step 1: embed all abstracts in this batch ---
+    # --- Step 1: embed_document all abstracts in this batch ---
     abstracts = [paper["abstract"] for paper in batch]
     print(f"  Embedding {len(abstracts)} abstracts...")
     texts = [paper["title"] + tokenizer.sep_token + paper["abstract"] for paper in batch]
-    embeddings = embed(texts, tokenizer, model)
+    embeddings = embed_document(texts, tokenizer, model)
 
     # --- Step 2: build Qdrant points ---
     points = []
