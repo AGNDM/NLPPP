@@ -14,6 +14,7 @@ def load_model_and_tokenizer(base_model_id, peft_model_id):
         bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.bfloat16
     )
+    print("Loading tokenizer...")
     tokenizer = AutoTokenizer.from_pretrained(base_model_id)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -22,10 +23,12 @@ def load_model_and_tokenizer(base_model_id, peft_model_id):
     base_model = AutoModelForCausalLM.from_pretrained(
         base_model_id,
         device_map="auto",
+        quantization_config=bnb_config,
         torch_dtype=torch.bfloat16,
     )
     
-    print(f"Loading LoRA weights from {peft_model_id}...")
+    # print(f"Loading LoRA weights from {peft_model_id}...")
+    # model = base_model
     model = PeftModel.from_pretrained(base_model, peft_model_id)
     model.eval()
     return model, tokenizer
@@ -68,10 +71,10 @@ def generate_answer_node(state: RAGState) -> dict:
     abstracts = "\n".join([f"[{i+1}] {chunk.payload["abstract"]}"  for i, chunk in enumerate(retrieved_chunks)])
 
     user_prompt = f"""
-    #Question\n{rewritten_query}\n\n#Context\n{nli_pairs}\n\n#Abstract\n{abstracts}\n\n"""
+    #Question\n {rewritten_query} \n\n  #Context \n {nli_pairs}\n\n #Abstract \n {abstracts} \n\n"""
 
     base_model_id = "allenai/Llama-3.1-Tulu-3-8B"
-    peft_model_id = "AGNDM/tulu_qasper_lora_final"
+    peft_model_id = "./tulu_qasper_lora_final"
     
     model, tokenizer = load_model_and_tokenizer(base_model_id, peft_model_id)
     print("\nModel loaded successfully! Enter your prompt below (or 'quit' to exit).")
@@ -82,5 +85,5 @@ def generate_answer_node(state: RAGState) -> dict:
     print(answer)
 
     return {
-        "answer": answer
+        "answer": "answer"
     }
