@@ -17,8 +17,9 @@ def chat(message: str, history: list[list[list]]):
     """
     Triggered when the user sends messages
     """
-    if not message.strip():
-        return "", history
-    else:
+    if message.strip():
+        
         reply = generate_bot_reply(message, history)
         history = history + [[message, reply]]
+
+    return "", history
