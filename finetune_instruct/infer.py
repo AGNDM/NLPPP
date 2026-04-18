@@ -45,7 +45,7 @@ def generate_answer(model, tokenizer, prompt, max_new_tokens=512):
         )
         
     # extract only the generated text (ignoring the prompt)
-    generated_text = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
+    generated_text = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=False)
     return generated_text
 
 if __name__ == "__main__":

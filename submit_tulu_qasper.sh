@@ -25,5 +25,7 @@ echo "Starting distributed training on 4 GPUs..."
 srun --environment=$SCRATCH/share/xianrong_liu/tut/ngc-pytorch-25.06.toml bash -c "
     source $SCRATCH/share/xianrong_liu/myvenv/bin/activate && \
     source $SCRATCH/share/xianrong_liu/cache_env_setup.sh && \
+    pip install datasets && \
+    cd tutorial_NLPPP && \
     torchrun --nproc_per_node=4 finetune_instruct/tulu_qasper_finetune.py
 "

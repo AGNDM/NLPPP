@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=qwen05b-qasper-ft
+#SBATCH --job-name=fft
 #SBATCH --account=a131
 #SBATCH --time=03:00:00
 #SBATCH --nodes=1
