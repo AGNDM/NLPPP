@@ -16,6 +16,8 @@ set -euo pipefail
 : "${VENV_ACTIVATE:=$./myvenv/bin/activate}"
 : "${CACHE_ENV_SETUP:=$./cache_env_setup.sh}"
 
+cd $SCRATCH/share/xianrong_liu
+
 srun -A a131 --environment="$NGC_ENV_FILE" bash -lc "
   source '$VENV_ACTIVATE' && \
   source '$CACHE_ENV_SETUP' && \
