@@ -16,7 +16,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run LoRA checkpoint inference across multiple GPUs.")
-    parser.add_argument("--input_parquet", type=str, default="eval_dataset_cleaning", help="Input parquet file or directory")
+    parser.add_argument("--input_parquet", type=str, default="eval_sc1_inference.parquet", help="Input parquet file or directory")
     parser.add_argument("--output_parquet", type=str, default="batch_inference_results.parquet", help="Output parquet file")
     parser.add_argument("--model_name", type=str, default="allenai/Llama-3.1-Tulu-3-8B", help="Base model name")
     parser.add_argument("--adapter_root", type=str, default="tulu_qasper_lora_output", help="Directory containing checkpoint-* folders")
