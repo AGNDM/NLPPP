@@ -147,13 +147,13 @@ def _generate_with_model(
                 padding=True,
                 truncation=False,
             )
-            device = next(lora_model.parameters()).device
+            device = next(model.parameters()).device
             inputs = {key: value.to(device) for key, value in inputs.items()}
-            input_lengths = inputs["attention_mask"].sum(dim=1)
+            prompt_width = inputs["input_ids"].shape[1]
 
-            generated_ids = lora_model.generate(**inputs, **generation_kwargs)
+            generated_ids = model.generate(**inputs, **generation_kwargs)
             batch_texts = [
-                tokenizer.decode(generated_ids[i, int(input_lengths[i]) :], skip_special_tokens=True).strip()
+                tokenizer.decode(generated_ids[i, prompt_width:], skip_special_tokens=True).strip()
                 for i in range(generated_ids.shape[0])
             ]
             outputs.extend(batch_texts)
