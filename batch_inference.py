@@ -28,6 +28,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_new_tokens", type=int, default=512, help="Max new tokens to generate")
     parser.add_argument("--temperature", type=float, default=0.0, help="Sampling temperature; 0 = greedy")
     parser.add_argument("--top_p", type=float, default=0.9, help="Nucleus sampling top-p")
+    parser.add_argument(
+        "--base_output_column",
+        type=str,
+        default="output_base_model",
+        help="Column name for base-model (no adapter) outputs",
+    )
+    parser.add_argument(
+        "--skip_base_model",
+        action="store_true",
+        help="Skip base-model (no adapter) inference column",
+    )
     return parser.parse_args()
 
 
@@ -78,10 +89,42 @@ def _generate_for_checkpoint(
     max_new_tokens: int,
     temperature: float,
     top_p: float,
-) -> List[str]:
+) -> tuple[List[str], object]:
     lora_model = PeftModel.from_pretrained(model, str(checkpoint_path))
     lora_model.eval()
 
+    outputs = _generate_with_model(
+        model=lora_model,
+        tokenizer=tokenizer,
+        prompts=df["input"].astype(str).tolist(),
+        batch_size=batch_size,
+        max_new_tokens=max_new_tokens,
+        temperature=temperature,
+        top_p=top_p,
+    )
+
+    if hasattr(lora_model, "unload"):
+        model = lora_model.unload()
+    else:
+        raise RuntimeError("Installed peft version does not support adapter unload(); please upgrade peft.")
+
+    del lora_model
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+
+    return outputs, model
+
+
+def _generate_with_model(
+    model,
+    tokenizer,
+    prompts: List[str],
+    batch_size: int,
+    max_new_tokens: int,
+    temperature: float,
+    top_p: float,
+) -> List[str]:
     do_sample = temperature > 0
     generation_kwargs = {
         "max_new_tokens": max_new_tokens,
@@ -93,7 +136,6 @@ def _generate_for_checkpoint(
     }
     generation_kwargs = {key: value for key, value in generation_kwargs.items() if value is not None}
 
-    prompts = df["input"].astype(str).tolist()
     outputs: List[str] = []
 
     with torch.inference_mode():
@@ -107,20 +149,14 @@ def _generate_for_checkpoint(
             )
             device = next(lora_model.parameters()).device
             inputs = {key: value.to(device) for key, value in inputs.items()}
-            prompt_len = inputs["input_ids"].shape[1]
+            input_lengths = inputs["attention_mask"].sum(dim=1)
 
             generated_ids = lora_model.generate(**inputs, **generation_kwargs)
             batch_texts = [
-                tokenizer.decode(generated_ids[i, prompt_len:], skip_special_tokens=True).strip()
+                tokenizer.decode(generated_ids[i, int(input_lengths[i]) :], skip_special_tokens=True).strip()
                 for i in range(generated_ids.shape[0])
             ]
             outputs.extend(batch_texts)
-
-    del lora_model
-    gc.collect()
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-
     return outputs
 
 
@@ -133,6 +169,8 @@ def _worker(
     max_new_tokens: int,
     temperature: float,
     top_p: float,
+    include_base_model: bool,
+    base_output_column: str,
     output_path: str,
 ) -> None:
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
@@ -140,12 +178,26 @@ def _worker(
     df = pd.read_parquet(input_parquet).reset_index(drop=True)
     tokenizer = _prepare_tokenizer(model_name)
     model = _load_base_model(model_name)
+    prompts = df["input"].astype(str).tolist()
 
     partial = pd.DataFrame({"row_id": df.index})
+    if include_base_model and gpu_id == 0:
+        print(f"[GPU {gpu_id}] Running base model (no adapter)...")
+        base_outputs = _generate_with_model(
+            model=model,
+            tokenizer=tokenizer,
+            prompts=prompts,
+            batch_size=batch_size,
+            max_new_tokens=max_new_tokens,
+            temperature=temperature,
+            top_p=top_p,
+        )
+        partial[base_output_column] = base_outputs
+
     for checkpoint_path in checkpoint_paths:
         checkpoint_num = checkpoint_path.name.split("-")[-1]
         print(f"[GPU {gpu_id}] Running checkpoint {checkpoint_num}...")
-        outputs = _generate_for_checkpoint(
+        outputs, model = _generate_for_checkpoint(
             model=model,
             tokenizer=tokenizer,
             df=df,
@@ -159,6 +211,11 @@ def _worker(
 
     partial.to_parquet(output_path, index=False)
     print(f"[GPU {gpu_id}] Wrote {output_path}")
+
+    del model
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
 
 def main() -> None:
@@ -192,6 +249,8 @@ def main() -> None:
                     args.max_new_tokens,
                     args.temperature,
                     args.top_p,
+                    not args.skip_base_model,
+                    args.base_output_column,
                     temp_file,
                 ),
             )
