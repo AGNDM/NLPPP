@@ -12,9 +12,9 @@
 set -euo pipefail
 
 : "${NGC_ENV_FILE:=$SCRATCH/share/xianrong_liu/tut/ngc-pytorch-25.06.toml}"
-: "${PROJECT_DIR:=$tutorial_NLPPP}"
-: "${VENV_ACTIVATE:=$myvenv/bin/activate}"
-: "${CACHE_ENV_SETUP:=$cache_env_setup.sh}"
+: "${PROJECT_DIR:=tutorial_NLPPP}"
+: "${VENV_ACTIVATE:=myvenv/bin/activate}"
+: "${CACHE_ENV_SETUP:=cache_env_setup.sh}"
 
 cd $SCRATCH/share/xianrong_liu
 
