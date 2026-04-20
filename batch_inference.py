@@ -9,6 +9,8 @@ from pathlib import Path
 from typing import List
 
 import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 import torch
 from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -28,6 +30,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max_new_tokens", type=int, default=512, help="Max new tokens to generate")
     parser.add_argument("--temperature", type=float, default=0.0, help="Sampling temperature; 0 = greedy")
     parser.add_argument("--top_p", type=float, default=0.9, help="Nucleus sampling top-p")
+    parser.add_argument("--debug", action="store_true", help="Enable debug logs")
+    parser.add_argument("--debug_samples", type=int, default=2, help="Number of samples to preview in debug logs")
+    parser.add_argument("--debug_chars", type=int, default=300, help="Max characters per debug preview")
+    parser.add_argument(
+        "--disable_chat_template",
+        action="store_true",
+        help="Do not wrap input prompts with tokenizer chat template",
+    )
     parser.add_argument(
         "--base_output_column",
         type=str,
@@ -66,7 +76,7 @@ def _prepare_tokenizer(model_name: str):
     return tokenizer
 
 
-def _load_base_model(model_name: str):
+def _load_model(model_name: str, checkpoint_path: Path | None = None):
     dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
@@ -74,46 +84,43 @@ def _load_base_model(model_name: str):
         low_cpu_mem_usage=True,
         device_map="auto",
     )
+    if checkpoint_path is not None:
+        model = PeftModel.from_pretrained(model, str(checkpoint_path))
     model.eval()
     model.config.pad_token_id = model.config.eos_token_id
     model.config.use_cache = True
     return model
 
 
-def _generate_for_checkpoint(
-    model,
-    tokenizer,
-    df: pd.DataFrame,
-    checkpoint_path: Path,
-    batch_size: int,
-    max_new_tokens: int,
-    temperature: float,
-    top_p: float,
-) -> tuple[List[str], object]:
-    lora_model = PeftModel.from_pretrained(model, str(checkpoint_path))
-    lora_model.eval()
-
-    outputs = _generate_with_model(
-        model=lora_model,
-        tokenizer=tokenizer,
-        prompts=df["input"].astype(str).tolist(),
-        batch_size=batch_size,
-        max_new_tokens=max_new_tokens,
-        temperature=temperature,
-        top_p=top_p,
-    )
-
-    if hasattr(lora_model, "unload"):
-        model = lora_model.unload()
-    else:
-        raise RuntimeError("Installed peft version does not support adapter unload(); please upgrade peft.")
-
-    del lora_model
+def _cleanup_model(model) -> None:
+    del model
     gc.collect()
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
-    return outputs, model
+
+def _truncate_for_log(text: str, max_chars: int) -> str:
+    text = text.replace("\n", "\\n")
+    if len(text) <= max_chars:
+        return text
+    return text[:max_chars] + "..."
+
+
+def _format_prompts(tokenizer, prompts: List[str], use_chat_template: bool) -> List[str]:
+    if not use_chat_template:
+        return prompts
+    if not hasattr(tokenizer, "apply_chat_template") or tokenizer.chat_template is None:
+        print("[WARN] tokenizer has no chat_template; falling back to raw input prompts")
+        return prompts
+
+    return [
+        tokenizer.apply_chat_template(
+            [{"role": "user", "content": prompt}],
+            tokenize=False,
+            add_generation_prompt=True,
+        )
+        for prompt in prompts
+    ]
 
 
 def _generate_with_model(
@@ -171,18 +178,35 @@ def _worker(
     top_p: float,
     include_base_model: bool,
     base_output_column: str,
+    use_chat_template: bool,
+    debug: bool,
+    debug_samples: int,
+    debug_chars: int,
     output_path: str,
 ) -> None:
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
 
     df = pd.read_parquet(input_parquet).reset_index(drop=True)
+    raw_prompts = df["input"].astype(str).tolist()
     tokenizer = _prepare_tokenizer(model_name)
-    model = _load_base_model(model_name)
-    prompts = df["input"].astype(str).tolist()
+    prompts = _format_prompts(
+        tokenizer=tokenizer,
+        prompts=raw_prompts,
+        use_chat_template=use_chat_template,
+    )
+
+    if debug and gpu_id == 0:
+        print(f"[DEBUG][GPU {gpu_id}] input rows={len(df)}, columns={list(df.columns)}")
+        print(f"[DEBUG][GPU {gpu_id}] use_chat_template={use_chat_template}, tokenizer_has_chat_template={tokenizer.chat_template is not None}")
+        preview_count = max(0, min(debug_samples, len(prompts)))
+        for i in range(preview_count):
+            print(f"[DEBUG][GPU {gpu_id}] raw_input[{i}]={_truncate_for_log(raw_prompts[i], debug_chars)}")
+            print(f"[DEBUG][GPU {gpu_id}] model_prompt[{i}]={_truncate_for_log(prompts[i], debug_chars)}")
 
     partial = pd.DataFrame({"row_id": df.index})
     if include_base_model and gpu_id == 0:
         print(f"[GPU {gpu_id}] Running base model (no adapter)...")
+        model = _load_model(model_name)
         base_outputs = _generate_with_model(
             model=model,
             tokenizer=tokenizer,
@@ -193,34 +217,46 @@ def _worker(
             top_p=top_p,
         )
         partial[base_output_column] = base_outputs
+        if debug:
+            preview_count = max(0, min(debug_samples, len(base_outputs)))
+            for i in range(preview_count):
+                print(f"[DEBUG][GPU {gpu_id}] {base_output_column}[{i}]={_truncate_for_log(base_outputs[i], debug_chars)}")
+        _cleanup_model(model)
 
     for checkpoint_path in checkpoint_paths:
         checkpoint_num = checkpoint_path.name.split("-")[-1]
         print(f"[GPU {gpu_id}] Running checkpoint {checkpoint_num}...")
-        outputs, model = _generate_for_checkpoint(
+        model = _load_model(model_name, checkpoint_path=checkpoint_path)
+        outputs = _generate_with_model(
             model=model,
             tokenizer=tokenizer,
-            df=df,
-            checkpoint_path=checkpoint_path,
+            prompts=prompts,
             batch_size=batch_size,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
         )
         partial[f"output_checkpoint_{checkpoint_num}"] = outputs
+        if debug:
+            preview_count = max(0, min(debug_samples, len(outputs)))
+            for i in range(preview_count):
+                print(f"[DEBUG][GPU {gpu_id}] output_checkpoint_{checkpoint_num}[{i}]={_truncate_for_log(outputs[i], debug_chars)}")
+        _cleanup_model(model)
 
     partial.to_parquet(output_path, index=False)
     print(f"[GPU {gpu_id}] Wrote {output_path}")
 
-    del model
-    gc.collect()
-    if torch.cuda.is_available():
-        torch.cuda.empty_cache()
-
 
 def main() -> None:
     args = parse_args()
-    df = pd.read_parquet(args.input_parquet).reset_index(drop=True)
+    input_table = pq.read_table(args.input_parquet)
+    num_rows = input_table.num_rows
+
+    if args.debug:
+        print(f"[DEBUG] input parquet: {args.input_parquet}")
+        print(f"[DEBUG] input rows: {num_rows}")
+        print(f"[DEBUG] input columns: {input_table.column_names}")
+        print(f"[DEBUG] input schema: {input_table.schema}")
 
     checkpoint_paths = _discover_checkpoints(
         adapter_root=args.adapter_root,
@@ -228,6 +264,10 @@ def main() -> None:
         end=args.end_checkpoint,
         step=args.checkpoint_step,
     )
+    if args.debug:
+        checkpoint_names = [path.name for path in checkpoint_paths]
+        print(f"[DEBUG] discovered checkpoints ({len(checkpoint_names)}): {checkpoint_names}")
+
     checkpoint_chunks = [chunk for chunk in _chunk_round_robin(checkpoint_paths, args.num_gpus) if chunk]
 
     with tempfile.TemporaryDirectory(prefix="batch_inference_") as tmpdir:
@@ -251,6 +291,10 @@ def main() -> None:
                     args.top_p,
                     not args.skip_base_model,
                     args.base_output_column,
+                    not args.disable_chat_template,
+                    args.debug,
+                    args.debug_samples,
+                    args.debug_chars,
                     temp_file,
                 ),
             )
@@ -262,14 +306,27 @@ def main() -> None:
             if proc.exitcode != 0:
                 raise RuntimeError("One of the GPU workers failed. Check the logs above.")
 
-        merged = df.copy()
-        merged.insert(0, "row_id", merged.index)
+        merged = pd.DataFrame({"row_id": range(num_rows)})
         for temp_file in temp_files:
             partial = pd.read_parquet(temp_file)
             merged = merged.merge(partial, on="row_id", how="left")
 
-        merged = merged.sort_values("row_id").drop(columns=["row_id"])
-        merged.to_parquet(args.output_parquet, index=False)
+        merged = merged.sort_values("row_id").drop(columns=["row_id"]).reset_index(drop=True)
+
+        if args.debug:
+            print(f"[DEBUG] merged output columns: {list(merged.columns)}")
+
+        output_table = input_table
+        for column_name in merged.columns:
+            output_table = output_table.append_column(
+                column_name,
+                pa.array(merged[column_name].astype(str).tolist(), type=pa.string()),
+            )
+        pq.write_table(output_table, args.output_parquet)
+
+        if args.debug:
+            print(f"[DEBUG] final output columns: {output_table.column_names}")
+            print(f"[DEBUG] final output schema: {output_table.schema}")
 
     print(f"Inference complete. Results saved to {args.output_parquet}")
 
