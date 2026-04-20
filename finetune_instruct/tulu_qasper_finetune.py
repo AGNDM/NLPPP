@@ -67,7 +67,7 @@ def main():
         logging_steps=10,
         num_train_epochs=1, # Adjust as per your dataset size
         save_strategy="steps",
-        save_steps=50,
+        save_steps=10,
         bf16=True, # GH200 supports bfloat16 perfectly
         report_to="none", # Switch to "wandb" or "tensorboard" if you use them
         remove_unused_columns=True, # Remove unused string columns like "text" to avoid collation errors
