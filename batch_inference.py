@@ -5,6 +5,7 @@ import gc
 import multiprocessing as mp
 import os
 import tempfile
+import time
 from pathlib import Path
 from typing import List
 
@@ -151,6 +152,9 @@ def _generate_with_model(
     max_new_tokens: int,
     temperature: float,
     top_p: float,
+    debug: bool = False,
+    debug_every_batches: int = 10,
+    log_prefix: str = "",
 ) -> List[str]:
     do_sample = temperature > 0
     generation_config = GenerationConfig(
@@ -163,9 +167,14 @@ def _generate_with_model(
     )
 
     outputs: List[str] = []
+    total_batches = (len(prompts) + batch_size - 1) // batch_size
+    start_time = time.time()
+
+    if debug:
+        print(f"[DEBUG]{log_prefix} generation_start prompts={len(prompts)} batches={total_batches} batch_size={batch_size}")
 
     with torch.inference_mode():
-        for start in range(0, len(prompts), batch_size):
+        for batch_idx, start in enumerate(range(0, len(prompts), batch_size), start=1):
             batch_prompts = prompts[start : start + batch_size]
             inputs = tokenizer(
                 batch_prompts,
@@ -183,6 +192,18 @@ def _generate_with_model(
                 for i in range(generated_ids.shape[0])
             ]
             outputs.extend(batch_texts)
+
+            if debug and (batch_idx % max(1, debug_every_batches) == 0 or batch_idx == total_batches):
+                elapsed = time.time() - start_time
+                avg_batch_sec = elapsed / batch_idx
+                print(
+                    f"[DEBUG]{log_prefix} generation_progress "
+                    f"batch={batch_idx}/{total_batches} elapsed={elapsed:.1f}s avg_batch={avg_batch_sec:.2f}s"
+                )
+
+    if debug:
+        total_elapsed = time.time() - start_time
+        print(f"[DEBUG]{log_prefix} generation_done outputs={len(outputs)} elapsed={total_elapsed:.1f}s")
     return outputs
 
 
@@ -247,6 +268,9 @@ def _worker(
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
+            debug=debug,
+            debug_every_batches=5,
+            log_prefix=f"[GPU {gpu_id}][base]",
         )
         partial[base_output_column] = base_outputs
         if debug:
@@ -270,6 +294,9 @@ def _worker(
             max_new_tokens=max_new_tokens,
             temperature=temperature,
             top_p=top_p,
+            debug=debug,
+            debug_every_batches=10,
+            log_prefix=f"[GPU {gpu_id}][ckpt {checkpoint_num}]",
         )
         partial[f"output_checkpoint_{checkpoint_num}"] = outputs
         if debug:
