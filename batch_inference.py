@@ -13,7 +13,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import torch
 from peft import PeftModel
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 
 
 def parse_args() -> argparse.Namespace:
@@ -80,9 +80,9 @@ def _load_model(model_name: str, checkpoint_path: Path | None = None):
     dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=dtype,
+        dtype=dtype,
         low_cpu_mem_usage=True,
-        device_map="auto",
+        device_map={"": 0} if torch.cuda.is_available() else None,
     )
     if checkpoint_path is not None:
         model = PeftModel.from_pretrained(model, str(checkpoint_path))
@@ -104,6 +104,26 @@ def _truncate_for_log(text: str, max_chars: int) -> str:
     if len(text) <= max_chars:
         return text
     return text[:max_chars] + "..."
+
+
+def _debug_gpu_memory(gpu_id: int, stage: str, debug: bool) -> None:
+    if not debug:
+        return
+    pid = os.getpid()
+    if not torch.cuda.is_available():
+        print(f"[DEBUG][GPU {gpu_id}][PID {pid}] {stage}: CUDA not available")
+        return
+
+    free_bytes, total_bytes = torch.cuda.mem_get_info(0)
+    allocated_bytes = torch.cuda.memory_allocated(0)
+    reserved_bytes = torch.cuda.memory_reserved(0)
+    print(
+        f"[DEBUG][GPU {gpu_id}][PID {pid}] {stage}: "
+        f"free={free_bytes / 1024**3:.2f}GiB "
+        f"allocated={allocated_bytes / 1024**3:.2f}GiB "
+        f"reserved={reserved_bytes / 1024**3:.2f}GiB "
+        f"total={total_bytes / 1024**3:.2f}GiB"
+    )
 
 
 def _format_prompts(tokenizer, prompts: List[str], use_chat_template: bool) -> List[str]:
@@ -133,15 +153,14 @@ def _generate_with_model(
     top_p: float,
 ) -> List[str]:
     do_sample = temperature > 0
-    generation_kwargs = {
-        "max_new_tokens": max_new_tokens,
-        "do_sample": do_sample,
-        "temperature": temperature if do_sample else None,
-        "top_p": top_p if do_sample else None,
-        "pad_token_id": tokenizer.pad_token_id,
-        "eos_token_id": tokenizer.eos_token_id,
-    }
-    generation_kwargs = {key: value for key, value in generation_kwargs.items() if value is not None}
+    generation_config = GenerationConfig(
+        max_new_tokens=max_new_tokens,
+        do_sample=do_sample,
+        temperature=temperature if do_sample else 1.0,
+        top_p=top_p if do_sample else 1.0,
+        pad_token_id=tokenizer.pad_token_id,
+        eos_token_id=tokenizer.eos_token_id,
+    )
 
     outputs: List[str] = []
 
@@ -158,7 +177,7 @@ def _generate_with_model(
             inputs = {key: value.to(device) for key, value in inputs.items()}
             prompt_width = inputs["input_ids"].shape[1]
 
-            generated_ids = model.generate(**inputs, **generation_kwargs)
+            generated_ids = model.generate(**inputs, generation_config=generation_config)
             batch_texts = [
                 tokenizer.decode(generated_ids[i, prompt_width:], skip_special_tokens=True).strip()
                 for i in range(generated_ids.shape[0])
@@ -185,6 +204,16 @@ def _worker(
     output_path: str,
 ) -> None:
     os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
+    os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
+
+    if torch.cuda.is_available():
+        torch.cuda.set_device(0)
+    if debug:
+        print(
+            f"[DEBUG][GPU {gpu_id}][PID {os.getpid()}] "
+            f"CUDA_VISIBLE_DEVICES={os.environ.get('CUDA_VISIBLE_DEVICES')}"
+        )
+    _debug_gpu_memory(gpu_id, "worker_start", debug)
 
     df = pd.read_parquet(input_parquet).reset_index(drop=True)
     raw_prompts = df["input"].astype(str).tolist()
@@ -206,7 +235,9 @@ def _worker(
     partial = pd.DataFrame({"row_id": df.index})
     if include_base_model and gpu_id == 0:
         print(f"[GPU {gpu_id}] Running base model (no adapter)...")
+        _debug_gpu_memory(gpu_id, "before_base_load", debug)
         model = _load_model(model_name)
+        _debug_gpu_memory(gpu_id, "after_base_load", debug)
         base_outputs = _generate_with_model(
             model=model,
             tokenizer=tokenizer,
@@ -222,11 +253,14 @@ def _worker(
             for i in range(preview_count):
                 print(f"[DEBUG][GPU {gpu_id}] {base_output_column}[{i}]={_truncate_for_log(base_outputs[i], debug_chars)}")
         _cleanup_model(model)
+        _debug_gpu_memory(gpu_id, "after_base_cleanup", debug)
 
     for checkpoint_path in checkpoint_paths:
         checkpoint_num = checkpoint_path.name.split("-")[-1]
         print(f"[GPU {gpu_id}] Running checkpoint {checkpoint_num}...")
+        _debug_gpu_memory(gpu_id, f"before_ckpt_{checkpoint_num}_load", debug)
         model = _load_model(model_name, checkpoint_path=checkpoint_path)
+        _debug_gpu_memory(gpu_id, f"after_ckpt_{checkpoint_num}_load", debug)
         outputs = _generate_with_model(
             model=model,
             tokenizer=tokenizer,
@@ -242,6 +276,7 @@ def _worker(
             for i in range(preview_count):
                 print(f"[DEBUG][GPU {gpu_id}] output_checkpoint_{checkpoint_num}[{i}]={_truncate_for_log(outputs[i], debug_chars)}")
         _cleanup_model(model)
+        _debug_gpu_memory(gpu_id, f"after_ckpt_{checkpoint_num}_cleanup", debug)
 
     partial.to_parquet(output_path, index=False)
     print(f"[GPU {gpu_id}] Wrote {output_path}")
