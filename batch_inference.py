@@ -76,13 +76,13 @@ def _prepare_tokenizer(model_name: str):
     return tokenizer
 
 
-def _load_model(model_name: str, checkpoint_path: Path | None = None):
+def _load_model(model_name: str, target_device: int, checkpoint_path: Path | None = None):
     dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
         dtype=dtype,
         low_cpu_mem_usage=True,
-        device_map={"": 0} if torch.cuda.is_available() else None,
+        device_map={"": target_device} if torch.cuda.is_available() else None,
     )
     if checkpoint_path is not None:
         model = PeftModel.from_pretrained(model, str(checkpoint_path))
@@ -114,9 +114,9 @@ def _debug_gpu_memory(gpu_id: int, stage: str, debug: bool) -> None:
         print(f"[DEBUG][GPU {gpu_id}][PID {pid}] {stage}: CUDA not available")
         return
 
-    free_bytes, total_bytes = torch.cuda.mem_get_info(0)
-    allocated_bytes = torch.cuda.memory_allocated(0)
-    reserved_bytes = torch.cuda.memory_reserved(0)
+    free_bytes, total_bytes = torch.cuda.mem_get_info(gpu_id)
+    allocated_bytes = torch.cuda.memory_allocated(gpu_id)
+    reserved_bytes = torch.cuda.memory_reserved(gpu_id)
     print(
         f"[DEBUG][GPU {gpu_id}][PID {pid}] {stage}: "
         f"free={free_bytes / 1024**3:.2f}GiB "
@@ -203,15 +203,16 @@ def _worker(
     debug_chars: int,
     output_path: str,
 ) -> None:
-    os.environ["CUDA_VISIBLE_DEVICES"] = str(gpu_id)
     os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
     if torch.cuda.is_available():
-        torch.cuda.set_device(0)
+        torch.cuda.set_device(gpu_id)
     if debug:
+        current_device = torch.cuda.current_device() if torch.cuda.is_available() else -1
+        device_name = torch.cuda.get_device_name(current_device) if torch.cuda.is_available() else "cpu"
         print(
             f"[DEBUG][GPU {gpu_id}][PID {os.getpid()}] "
-            f"CUDA_VISIBLE_DEVICES={os.environ.get('CUDA_VISIBLE_DEVICES')}"
+            f"current_device={current_device} device_name={device_name}"
         )
     _debug_gpu_memory(gpu_id, "worker_start", debug)
 
@@ -236,7 +237,7 @@ def _worker(
     if include_base_model and gpu_id == 0:
         print(f"[GPU {gpu_id}] Running base model (no adapter)...")
         _debug_gpu_memory(gpu_id, "before_base_load", debug)
-        model = _load_model(model_name)
+        model = _load_model(model_name, target_device=gpu_id)
         _debug_gpu_memory(gpu_id, "after_base_load", debug)
         base_outputs = _generate_with_model(
             model=model,
@@ -259,7 +260,7 @@ def _worker(
         checkpoint_num = checkpoint_path.name.split("-")[-1]
         print(f"[GPU {gpu_id}] Running checkpoint {checkpoint_num}...")
         _debug_gpu_memory(gpu_id, f"before_ckpt_{checkpoint_num}_load", debug)
-        model = _load_model(model_name, checkpoint_path=checkpoint_path)
+        model = _load_model(model_name, target_device=gpu_id, checkpoint_path=checkpoint_path)
         _debug_gpu_memory(gpu_id, f"after_ckpt_{checkpoint_num}_load", debug)
         outputs = _generate_with_model(
             model=model,
@@ -304,6 +305,9 @@ def main() -> None:
         print(f"[DEBUG] discovered checkpoints ({len(checkpoint_names)}): {checkpoint_names}")
 
     checkpoint_chunks = [chunk for chunk in _chunk_round_robin(checkpoint_paths, args.num_gpus) if chunk]
+    if args.debug:
+        chunk_info = {gpu_id: [path.name for path in chunk] for gpu_id, chunk in enumerate(checkpoint_chunks)}
+        print(f"[DEBUG] worker checkpoint assignment: {chunk_info}")
 
     with tempfile.TemporaryDirectory(prefix="batch_inference_") as tmpdir:
         ctx = mp.get_context("spawn")
