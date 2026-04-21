@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=tulu-inf
+#SBATCH --job-name=tulu-inf_2
 #SBATCH --account=a131
 #SBATCH --time=02:00:00
 #SBATCH --nodes=1
@@ -22,5 +22,5 @@ srun -A a131 --environment="$NGC_ENV_FILE" bash -lc "
   source '$VENV_ACTIVATE' && \
   source '$CACHE_ENV_SETUP' && \
   cd '$PROJECT_DIR' && \
-  python batch_inference.py
+  python batch_inference.py --debug --input_parquet eval_sc2_inference.parquet --output_parquet sc2_with_ppl.parquet
 "
