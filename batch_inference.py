@@ -144,6 +144,99 @@ def _format_prompts(tokenizer, prompts: List[str], use_chat_template: bool) -> L
     ]
 
 
+def _compute_perplexities(
+    model,
+    tokenizer,
+    prompts: List[str],
+    outputs: List[str],
+    batch_size: int = 4,
+) -> List[float]:
+    """Compute perplexity for each generated output.
+    
+    Args:
+        model: The language model
+        tokenizer: The tokenizer
+        prompts: List of original prompts
+        outputs: List of generated outputs
+        batch_size: Batch size for evaluation
+        
+    Returns:
+        List of perplexity scores (one per output)
+    """
+    perplexities = []
+    
+    with torch.inference_mode():
+        for batch_start in range(0, len(outputs), batch_size):
+            batch_end = min(batch_start + batch_size, len(outputs))
+            batch_prompts = prompts[batch_start:batch_end]
+            batch_outputs = outputs[batch_start:batch_end]
+            
+            # Concatenate prompt + output for evaluation
+            full_texts = [f"{p}{o}" for p, o in zip(batch_prompts, batch_outputs)]
+            
+            inputs = tokenizer(
+                full_texts,
+                return_tensors="pt",
+                padding=True,
+                truncation=False,
+            )
+            device = next(model.parameters()).device
+            inputs = {key: value.to(device) for key, value in inputs.items()}
+            
+            # Get prompt token lengths to identify output portion
+            prompt_inputs = tokenizer(
+                batch_prompts,
+                return_tensors="pt",
+                padding=True,
+                truncation=False,
+            )
+            prompt_inputs = {key: value.to(device) for key, value in prompt_inputs.items()}
+            prompt_lengths = (prompt_inputs["attention_mask"] == 1).sum(dim=1).tolist()
+            
+            # Forward pass to get logits
+            outputs_dict = model(
+                input_ids=inputs["input_ids"],
+                attention_mask=inputs["attention_mask"],
+                return_dict=True,
+            )
+            logits = outputs_dict.logits
+            
+            # Compute loss for each sample
+            for i, (prompt_len, full_text) in enumerate(zip(prompt_lengths, full_texts)):
+                # Get indices of output tokens (after prompt)
+                input_ids = inputs["input_ids"][i]
+                
+                # Ensure we have tokens for output part
+                if prompt_len >= len(input_ids):
+                    perplexities.append(float('inf'))
+                    continue
+                
+                # Compute loss for output tokens
+                output_logits = logits[i, prompt_len - 1 : -1, :]
+                output_ids = input_ids[prompt_len:]
+                
+                if len(output_ids) == 0:
+                    perplexities.append(float('inf'))
+                    continue
+                
+                # Cross entropy loss
+                shift_logits = output_logits.contiguous()
+                shift_labels = output_ids.contiguous()
+                
+                # Use CrossEntropyLoss
+                ce_loss = torch.nn.functional.cross_entropy(
+                    shift_logits.view(-1, shift_logits.size(-1)),
+                    shift_labels.view(-1),
+                    reduction='mean',
+                )
+                
+                # Perplexity = exp(loss)
+                ppl = float(torch.exp(ce_loss).cpu())
+                perplexities.append(ppl)
+    
+    return perplexities
+
+
 def _generate_with_model(
     model,
     tokenizer,
@@ -155,7 +248,8 @@ def _generate_with_model(
     debug: bool = False,
     debug_every_batches: int = 10,
     log_prefix: str = "",
-) -> List[str]:
+    compute_perplexity: bool = True,
+) -> tuple[List[str], List[float]]:
     do_sample = temperature > 0
     generation_config = GenerationConfig(
         max_new_tokens=max_new_tokens,
@@ -204,7 +298,18 @@ def _generate_with_model(
     if debug:
         total_elapsed = time.time() - start_time
         print(f"[DEBUG]{log_prefix} generation_done outputs={len(outputs)} elapsed={total_elapsed:.1f}s")
-    return outputs
+    
+    perplexities = []
+    if compute_perplexity:
+        if debug:
+            print(f"[DEBUG]{log_prefix} computing_perplexities...")
+        perplexities = _compute_perplexities(model, tokenizer, prompts, outputs, batch_size=batch_size)
+        if debug:
+            print(f"[DEBUG]{log_prefix} perplexities_computed mean={sum(perplexities) / len(perplexities):.4f}")
+    else:
+        perplexities = [0.0] * len(outputs)
+    
+    return outputs, perplexities
 
 
 def _worker(
@@ -260,7 +365,7 @@ def _worker(
         _debug_gpu_memory(gpu_id, "before_base_load", debug)
         model = _load_model(model_name, target_device=gpu_id)
         _debug_gpu_memory(gpu_id, "after_base_load", debug)
-        base_outputs = _generate_with_model(
+        base_outputs, base_perplexities = _generate_with_model(
             model=model,
             tokenizer=tokenizer,
             prompts=prompts,
@@ -271,12 +376,15 @@ def _worker(
             debug=debug,
             debug_every_batches=5,
             log_prefix=f"[GPU {gpu_id}][base]",
+            compute_perplexity=True,
         )
         partial[base_output_column] = base_outputs
+        partial[f"{base_output_column}_ppl"] = base_perplexities
         if debug:
             preview_count = max(0, min(debug_samples, len(base_outputs)))
             for i in range(preview_count):
                 print(f"[DEBUG][GPU {gpu_id}] {base_output_column}[{i}]={_truncate_for_log(base_outputs[i], debug_chars)}")
+                print(f"[DEBUG][GPU {gpu_id}] {base_output_column}_ppl[{i}]={base_perplexities[i]:.4f}")
         _cleanup_model(model)
         _debug_gpu_memory(gpu_id, "after_base_cleanup", debug)
 
@@ -286,7 +394,7 @@ def _worker(
         _debug_gpu_memory(gpu_id, f"before_ckpt_{checkpoint_num}_load", debug)
         model = _load_model(model_name, target_device=gpu_id, checkpoint_path=checkpoint_path)
         _debug_gpu_memory(gpu_id, f"after_ckpt_{checkpoint_num}_load", debug)
-        outputs = _generate_with_model(
+        outputs, perplexities = _generate_with_model(
             model=model,
             tokenizer=tokenizer,
             prompts=prompts,
@@ -297,12 +405,15 @@ def _worker(
             debug=debug,
             debug_every_batches=10,
             log_prefix=f"[GPU {gpu_id}][ckpt {checkpoint_num}]",
+            compute_perplexity=True,
         )
         partial[f"output_checkpoint_{checkpoint_num}"] = outputs
+        partial[f"output_checkpoint_{checkpoint_num}_ppl"] = perplexities
         if debug:
             preview_count = max(0, min(debug_samples, len(outputs)))
             for i in range(preview_count):
                 print(f"[DEBUG][GPU {gpu_id}] output_checkpoint_{checkpoint_num}[{i}]={_truncate_for_log(outputs[i], debug_chars)}")
+                print(f"[DEBUG][GPU {gpu_id}] output_checkpoint_{checkpoint_num}_ppl[{i}]={perplexities[i]:.4f}")
         _cleanup_model(model)
         _debug_gpu_memory(gpu_id, f"after_ckpt_{checkpoint_num}_cleanup", debug)
 
