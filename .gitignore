@@ -7,7 +7,7 @@ __pycache__/
 .venv/
 
 # Data & models (large files)
-data/
+/data/
 *.bin
 *.safetensors
 *.pt
