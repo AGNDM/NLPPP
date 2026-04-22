@@ -1,3 +1,22 @@
+"""
+app.py
+------
+Streamlit frontend for the NLP Research Assistant RAG pipeline.
+
+Renders a chat interface where a user submits a natural language question.
+Each pipeline stage runs sequentially and surfaces its intermediate output
+via st.status blocks so the user can follow along in real time:
+
+    1. Query rewriting: cleans and denoises the raw question for retrieval
+    2. Retrieval:       fetches top-k chunks from the Qdrant vector store
+    3. Relevance grading: filters out chunks the LLM deems off-topic
+    4. Contradiction detection: flags pairs of chunks with conflicting claims
+    5. Answer generation: produces a grounded answer from the surviving chunks
+
+Run with:
+    streamlit run app.py
+"""
+
 import streamlit as st
 
 from pipeline.rewrite import rewrite_query
