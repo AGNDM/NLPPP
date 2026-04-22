@@ -1,6 +1,21 @@
+"""
+grade.py
+--------
+LangGraph node for relevance grading of retrieved paper chunks.
+
+After retrieval from Qdrant, not all returned chunks are guaranteed to be
+directly useful for answering the question. This module filters them by
+prompting an LLM to judge whether each abstract contains facts or findings
+that would concretely help answer the query — domain similarity alone is
+not sufficient to pass.
+
+Reuses the same OpenRouter LLM instance as the query rewriter (see rewrite.py).
+"""
+
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
+from qdrant_client.models import ScoredPoint
 
 from pipeline.state import RAGState
 from pipeline.constants import REWRITE_MODEL
@@ -32,7 +47,7 @@ Abstract: {abstract}
 Answer:"""
 
 
-def grade_chunks(state: RAGState) -> dict:
+def grade_chunks(state: RAGState) -> dict[str, list[ScoredPoint]]:
     """LangGraph node: filters retrieved chunks to only those directly relevant to the query."""
     question = state["rewritten_user_question"]
     chunks = state["retrieved_chunks"]
