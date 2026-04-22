@@ -1,3 +1,9 @@
+"""
+helpers.py
+----------
+Shared embedding and Qdrant utilities used across the RAG pipeline.
+"""
+
 import os
 import torch
 import numpy as np
@@ -5,7 +11,8 @@ from dotenv import load_dotenv
 from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
 from qdrant_client import QdrantClient
-from typing import cast
+from qdrant_client.models import ScoredPoint
+
 
 load_dotenv()
 
@@ -107,6 +114,12 @@ def embed_query(text: str, tokenizer: AutoTokenizer, model: AutoAdapterModel) ->
 # ── Connect to Qdrant ─────────────────────────────────────────────────────────
 
 def get_qdrant_client() -> QdrantClient:
+    """
+    Initialise and return a Qdrant client using environment credentials.
+
+    Returns:
+        QdrantClient: A connected client instance ready for querying.
+    """
     print("Connecting to Qdrant...")
     client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
     print("  → Connected\n")
@@ -121,18 +134,20 @@ def query_vector_db(
         collection_name: str = "nlp_papers",
         top_k: int = 3,
         with_vectors: bool = False
-    ) -> list:
+    ) -> list[ScoredPoint]:
     """
     Query the vector database for similar papers.
-    
+
     Args:
         client (QdrantClient): An instance of the Qdrant client.
         query_embedding (np.ndarray): The embedding vector for the user's query.
         collection_name (str): The name of the Qdrant collection to search.
         top_k (int): The number of top results to return.
-        
+        with_vectors (bool): Whether to include the raw vectors in the results.
+            Defaults to False; set True for debugging or re-ranking.
+
     Returns:
-        list: A list of search results with metadata.
+        list[ScoredPoint]: A list of search results with metadata.
     """
     results = client.query_points(
         collection_name=collection_name,
