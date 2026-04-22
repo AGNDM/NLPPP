@@ -1,8 +1,27 @@
-# scrape_papers.py
+"""
+scrape_papers.py
+----------------
+Scrapes NLP papers from Semantic Scholar and saves them to disk.
+
+Collects roughly 1,000 high-quality NLP papers published between 2015 and 2023,
+filtered by citation count, venue, and field of study. Citation thresholds scale
+down for more recent years to account for papers having had less time to
+accumulate citations.
+
+Results are saved incrementally to data/papers.json after each year, so progress
+is preserved if the script is interrupted. Pagination and rate-limit retries are
+handled automatically by the semanticscholar library.
+
+Output:
+    data/papers.json — list of paper objects with title, abstract, authors,
+    year, venue, citation count, and open-access PDF URL where available.
+"""
+
 import json
 import time
 from pathlib import Path
 from semanticscholar import SemanticScholar
+from semanticscholar.Paper import Paper
 
 # ── Output ────────────────────────────────────────────────────────────────────
 OUTPUT_FILE = Path("data/papers.json")
@@ -42,7 +61,7 @@ for year in range(2015, 2024):
     # bulk=True  → uses the bulk search endpoint (much more permissive rate limits)
     # fields_of_study → server-side filter, saves wasted pages
     # venue        → server-side filter for high-quality NLP conferences
-    results = sch.search_paper(
+    results: list[Paper] = sch.search_paper(
         query="natural language processing",
         year=str(year),
         min_citation_count=min_cit,
