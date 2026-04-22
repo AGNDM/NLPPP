@@ -1,6 +1,25 @@
+"""
+upsertData.py
+-------------
+Embeds scraped NLP papers and uploads them to the Qdrant vector database.
+
+Reads papers from data/papers.json, embeds each one as a SPECTER 2 vector
+using the title and abstract, and upserts them in batches into the configured
+Qdrant collection. Each paper is stored as a point with a random UUID and its
+full metadata as payload.
+
+Intended to be run once after scrape_papers.py has populated data/papers.json.
+The collection is created automatically if it does not already exist.
+
+Input:
+    data/papers.json — output of scrape_papers.py
+
+Output:
+    Populated Qdrant collection ready for inference-time retrieval.
+"""
+
 import json
 import time
-import os
 import uuid
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
