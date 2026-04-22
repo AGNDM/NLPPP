@@ -49,7 +49,20 @@ SYSTEM_PROMPT = (
 # Core logic
 # ---------------------------------------------------------------------------
 
-def query_llama(client, question: str) -> str:
+def query_llama(client: OpenAI, question: str) -> str:
+    """
+    Send a question to LLaMA and return its raw text response.
+
+    The model is queried with no retrieved context, parametric memory only.
+    Temperature is fixed at 0 for fully deterministic outputs.
+
+    Args:
+        client:   Initialised OpenAI-compatible client pointed at OpenRouter.
+        question: The question string to send to the model.
+
+    Returns:
+        The model's response as a stripped plain-text string.
+    """
     response = client.chat.completions.create(
         model=MODEL,
         messages=[
@@ -62,12 +75,42 @@ def query_llama(client, question: str) -> str:
     return response.choices[0].message.content.strip()
 
 
-def check_answer(model_output: str, expected_answers: list) -> bool:
+def check_answer(model_output: str, expected_answers: list[str]) -> bool:
+    """
+    Check whether the model's output contains any of the expected answers.
+
+    Matching is case-insensitive substring search. A question passes if *any*
+    string in expected_answers appears anywhere in model_output. This handles
+    surface-form variation (e.g. "87.3 F1" vs "an F1 of 87.3").
+
+    Args:
+        model_output:     The raw text returned by the model.
+        expected_answers: List of acceptable answer strings for this question.
+
+    Returns:
+        True if at least one expected answer is found in the model output.
+    """
     output_lower = model_output.lower()
     return any(ans.lower() in output_lower for ans in expected_answers)
 
 
-def run_verification(client, questions: list) -> tuple:
+def run_verification(client: OpenAI, questions: list[dict]) -> tuple[list[dict], list[dict]]:
+    """
+    Run all questions through LLaMA and split them into passed and failed.
+
+    Each question is sent without any retrieved context so that the result
+    reflects the model's parametric knowledge only. Questions are processed
+    sequentially with a short sleep between requests to respect rate limits.
+
+    Args:
+        client:    Initialised OpenAI-compatible client pointed at OpenRouter.
+        questions: List of question objects, each containing at minimum
+                   'question' and 'expected_answers' keys.
+
+    Returns:
+        A 2-tuple of (correctly_answered, failed), where each is a list of
+        question objects augmented with 'model_answer' and 'passed' fields.
+    """
     correctly_answered, failed = [], []
 
     print(f"\nVerifying {len(questions)} questions against {MODEL}\n")
@@ -99,7 +142,20 @@ def run_verification(client, questions: list) -> tuple:
     return correctly_answered, failed
 
 
-def save_results(correctly_answered: list, failed: list, output_path: str) -> None:
+def save_results(correctly_answered: list[dict], failed: list[dict], output_path: str) -> None:
+    """
+    Write verified questions to disk and print a summary to stdout.
+
+    Only correctly answered questions are written to the output file, these
+    are the examples suitable for inclusion in the evaluation dataset. Failed
+    questions are logged to stdout for manual review but not saved.
+
+    Args:
+        correctly_answered: Question objects where the model answered correctly.
+        failed:             Question objects where the model answered incorrectly
+                            or an API error occurred.
+        output_path:        File path for the output JSON file.
+    """
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(correctly_answered, f, indent=2, ensure_ascii=False)
 
