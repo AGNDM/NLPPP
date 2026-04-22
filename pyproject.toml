@@ -12,6 +12,7 @@ dependencies = [
     "matplotlib>=3.10.8",
     "openai>=2.31.0",
     "pandas>=3.0.2",
+    "pandas-stubs>=3.0.0.260204",
     "peft>=0.19.0",
     "pyarrow>=23.0.1",
     "python-dotenv>=1.2.2",
