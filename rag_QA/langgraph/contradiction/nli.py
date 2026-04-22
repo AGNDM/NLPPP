@@ -1,3 +1,25 @@
+"""
+nli.py
+------
+Contradiction detection for retrieved RAG chunks using a CrossEncoder NLI model.
+
+Implements a two-stage pipeline to identify conflicting claims across retrieved
+paper chunks:
+    1. Cosine similarity pre-filter — only chunk pairs above a similarity
+       threshold are considered, avoiding unnecessary NLI inference on
+       unrelated pairs.
+    2. NLI classification — shortlisted pairs are passed to a CrossEncoder
+       and labelled as contradiction, entailment, or neutral.
+
+The public interface is detect_contradictions(), which takes Qdrant ScoredPoints
+and returns the index pairs of any chunks found to contradict each other.
+test_contradiction_pipeline() is provided for offline evaluation without a live
+Qdrant retrieval step.
+
+Note: query_vector_db() must be called with with_vectors=True for cosine
+similarity pre-filtering to work.
+"""
+
 import numpy as np
 from sentence_transformers import CrossEncoder
 from qdrant_client.models import ScoredPoint
