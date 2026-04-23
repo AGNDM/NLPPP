@@ -1,4 +1,19 @@
+"""
+rag.py
+------
+LangGraph node for embedding and retrieval.
+
+Embeds the rewritten query using SPECTER 2's adhoc_query adapter and retrieves
+the top-K most similar paper chunks from Qdrant above a similarity threshold.
+Vectors are included in the results for downstream cosine similarity
+pre-filtering in the NLI contradiction detection step.
+
+The SPECTER 2 query model and Qdrant client are initialised once at import
+time — both are expensive to load and should not be recreated per query.
+"""
+
 from dotenv import load_dotenv
+from qdrant_client.models import ScoredPoint
 
 from rag_QA.vectorDB.helpers import load_query_model, embed_query, get_qdrant_client
 
@@ -17,7 +32,7 @@ _query_tokenizer, _query_model = load_query_model()
 _qdrant = get_qdrant_client()
 
 
-def retrieve(state: RAGState) -> dict:
+def retrieve(state: RAGState) -> dict[str, list[ScoredPoint]]:
     """Embed the rewritten query and fetch the top-K most similar papers from Qdrant."""
     query_vector = embed_query(state["rewritten_query"], _query_tokenizer, _query_model).tolist()
 
