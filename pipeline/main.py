@@ -1,3 +1,26 @@
+"""
+main.py
+-------
+CLI entry point for the RAG pipeline.
+
+Run directly to start an interactive session:
+
+    python main.py
+
+Defines and compiles the LangGraph pipeline, wiring six nodes into a linear
+graph — including ask_user, which handles stdin input for the CLI session.
+The remaining five nodes are shared with app.py, which calls them directly
+rather than via this graph:
+
+    ask_user → rewrite_query → retrieve → grade_chunks
+             → detect_contradictions → generate_answer
+
+Each node receives the full RAGState and returns a partial dict that
+LangGraph merges back into the state before passing it to the next node.
+
+For the Gradio/Streamlit interface, see app.py.
+"""
+
 from langgraph.graph import StateGraph, START, END
 
 from pipeline.state import RAGState
