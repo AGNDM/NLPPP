@@ -1,3 +1,19 @@
+"""
+rewrite.py
+----------
+LangGraph node for query rewriting.
+
+Transforms the user's raw question into two outputs using an LLM:
+    1. A short, keyword-dense retrieval query for semantic search over Qdrant.
+    2. A clean, self-contained rewritten question passed to the answer generator.
+
+Retries once if the model returns a malformed response, then falls back to the
+original query for both fields so the pipeline can continue rather than crash.
+
+The ChatOpenAI client is initialised once at import time with temperature=0
+to keep rewrites deterministic across calls.
+"""
+
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 import os
@@ -48,7 +64,7 @@ def _parse(response_text: str) -> tuple[str, str] | None:
     return None
 
 
-def rewrite_query(state: RAGState) -> dict:
+def rewrite_query(state: RAGState) -> dict[str, str]:
     """Rewrite the user's raw question into a retrieval-optimised query.
 
     Retries once if the model ignores the format instruction.
