@@ -1,5 +1,24 @@
-from __future__ import annotations
+"""
+build_shared_corpus.py
+----------------------
+Builds the shared retrieval corpus JSON used by both BM25 and dense retrieval.
 
+Reads the raw papers.json produced by scrape_papers.py, filters out papers
+with missing IDs or abstracts, deduplicates by paper ID, and writes a
+normalised JSON list to disk.
+
+Each output record contains: doc_id, title, abstract, text (title + abstract),
+year, and venue. The text field is the string indexed by both retrievers.
+
+Usage:
+    python build_shared_corpus.py
+    python build_shared_corpus.py --input path/to/papers.json --output path/to/corpus.json
+
+Output:
+    evaluation_study/data/shared_corpus.json
+"""
+
+from __future__ import annotations
 import argparse
 import json
 import sys
@@ -15,6 +34,7 @@ DEFAULT_OUTPUT = ROOT / "evaluation_study" / "data" / "shared_corpus.json"
 
 
 def safe_str(value: Any) -> str:
+    """Load, filter, and normalise papers into shared corpus records."""
     if value is None:
         return ""
     return str(value).strip()
@@ -63,9 +83,7 @@ def is_valid_paper(paper: dict[str, Any]) -> bool:
 
 
 def deduplicate_by_doc_id(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """
-    Deduplicate corpus records by doc_id, keeping the first occurrence.
-    """
+    """Deduplicate corpus records by doc_id, keeping the first occurrence."""
     seen = set()
     deduped = []
 
@@ -80,6 +98,7 @@ def deduplicate_by_doc_id(records: list[dict[str, Any]]) -> list[dict[str, Any]]
 
 
 def build_shared_corpus(input_path: Path) -> list[dict[str, Any]]:
+    """Load, filter, and normalise papers into shared corpus records."""
     print(f"Loading papers from: {input_path}")
     with open(input_path, "r", encoding="utf-8") as f:
         papers = json.load(f)
@@ -100,6 +119,7 @@ def build_shared_corpus(input_path: Path) -> list[dict[str, Any]]:
 
 
 def save_json(records: list[dict[str, Any]], output_path: Path) -> None:
+    """Serialise corpus records to a JSON file, creating parent dirs if needed."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(records, f, ensure_ascii=False, indent=2)
@@ -107,6 +127,7 @@ def save_json(records: list[dict[str, Any]], output_path: Path) -> None:
 
 
 def main() -> None:
+    """Parse arguments and run the corpus build pipeline."""
     parser = argparse.ArgumentParser()
     # Path to papers.json
     parser.add_argument(
