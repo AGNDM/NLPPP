@@ -2,7 +2,7 @@
 
 A Retrieval-Augmented Generation (RAG) pipeline to answer questions about NLP questions. It features query rewriting, dual-mode retrieval (Dense & BM25), contradiction detection (NLI), and grounded answer generation with fine-tuned model.
 
-## 🚀 Key Features
+## Key Features
 
 - **Unified RAG App**: A Streamlit-based UI to interact with the pipeline.
 - **Dual Retrieval Modes**:
@@ -11,7 +11,7 @@ A Retrieval-Augmented Generation (RAG) pipeline to answer questions about NLP qu
 - **Contradiction Detection**: Uses NLI (Natural Language Inference) to identify conflicting information between retrieved papers.
 - **Fine-tuned Models**: Optimized for NLP domain tasks.
 
-## 📦 Installation
+## Installation
 
 This project uses [uv](https://github.com/astral-sh/uv) for fast, reliable dependency management.
 
@@ -24,7 +24,7 @@ cd NLPPP
 uv sync
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 1. **Environment Variables**:
    Copy `.env.example` to `.env` and provide your API keys:
@@ -35,7 +35,7 @@ uv sync
    - `QDRANT_URL` & `QDRANT_API_KEY`: For vector database access.
    - `OPENROUTER_API_KEY`: For LLM-based query rewriting and generation.
 
-## 🛠️ How to Run
+## How to Run
 
 ### 1. Unified Streamlit Application (Recommended)
 
@@ -53,7 +53,7 @@ Run the LangGraph-based pipeline directly in the terminal (defaults to Dense RAG
 uv run python -m pipeline.main
 ```
 
-## 🏗️ Project Structure
+## Project Structure
 
 - `app_unified.py`: Unified Streamlit interface.
 - `pipeline/`: Core RAG logic.
@@ -66,7 +66,7 @@ uv run python -m pipeline.main
 - `evaluation_study/`: Scripts for batch inference and metric analysis.
 - `finetuning/`: Training scripts for domain-specific models.
 
-## 🤖 Fine-tuned Models
+## Fine-tuned Models
 
 - **Qwen-0.5B**: [AGNDM/Fine-tuned_NLP_Qwen_0.5B](https://huggingface.co/AGNDM/Fine-tuned_NLP_Qwen_0.5B)
 - **Tulu-Qasper-LoRA**: [AGNDM/tulu_qasper_lora_final](https://huggingface.co/AGNDM/tulu_qasper_lora_final)
