@@ -5,6 +5,7 @@ from transformers import (
     AutoTokenizer,
     TrainingArguments,
 )
+import os
 from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer, SFTConfig, DataCollatorForCompletionOnlyLM
 
@@ -24,7 +25,6 @@ def main():
         print("Tokenizer has no pad_token. Setting pad_token to eos_token for Llama 3 generation compatibility.")
         tokenizer.pad_token = tokenizer.eos_token
 
-    import os
     local_rank = int(os.environ.get("LOCAL_RANK", 0))
 
     print(f"Loading model {model_name} on device {local_rank}...")
@@ -61,20 +61,20 @@ def main():
     # 4. Training Arguments
     training_args = SFTConfig(
         output_dir="./tulu_qasper_lora_output",
-        per_device_train_batch_size=8, # GH200 has 96GB/144GB VRAM, can use a larger batch size
-        gradient_accumulation_steps=1, # Adjust if you want larger effective batch size
+        per_device_train_batch_size=8,
+        gradient_accumulation_steps=1,
         learning_rate=2e-4,
         logging_steps=10,
-        num_train_epochs=1, # Adjust as per your dataset size
+        num_train_epochs=1,
         save_strategy="steps",
         save_steps=10,
-        bf16=True, # GH200 supports bfloat16 perfectly
-        report_to="none", # Switch to "wandb" or "tensorboard" if you use them
-        remove_unused_columns=True, # Remove unused string columns like "text" to avoid collation errors
+        bf16=True,
+        report_to="none",
+        remove_unused_columns=True,
         ddp_find_unused_parameters=False, # Required for LoRA training with DDP
-        gradient_checkpointing=True, # Save memory for large models
+        gradient_checkpointing=True, 
         max_seq_length=2048,
-        dataset_kwargs={"skip_prepare_dataset": True}, # Skip SFTTrainer's internal formatting to use pre-tokenized data
+        dataset_kwargs={"skip_prepare_dataset": True},
     )
 
     # 5. Initialize SFTTrainer

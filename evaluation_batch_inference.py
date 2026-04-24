@@ -1,5 +1,5 @@
+# This script performs batch inference across multiple LoRA checkpoints on multiple GPUs, and saves the generated outputs and perplexity scores to a parquet file. 
 from __future__ import annotations
-
 import argparse
 import gc
 import multiprocessing as mp
@@ -8,7 +8,6 @@ import tempfile
 import time
 from pathlib import Path
 from typing import List
-
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -34,22 +33,9 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--debug", action="store_true", help="Enable debug logs")
     parser.add_argument("--debug_samples", type=int, default=2, help="Number of samples to preview in debug logs")
     parser.add_argument("--debug_chars", type=int, default=300, help="Max characters per debug preview")
-    parser.add_argument(
-        "--disable_chat_template",
-        action="store_true",
-        help="Do not wrap input prompts with tokenizer chat template",
-    )
-    parser.add_argument(
-        "--base_output_column",
-        type=str,
-        default="output_base_model",
-        help="Column name for base-model (no adapter) outputs",
-    )
-    parser.add_argument(
-        "--skip_base_model",
-        action="store_true",
-        help="Skip base-model (no adapter) inference column",
-    )
+    parser.add_argument("--disable_chat_template", action="store_true", help="Do not wrap input prompts with tokenizer chat template")
+    parser.add_argument("--base_output_column", type=str, default="output_base_model", help="Column name for base-model (no adapter) outputs")
+    parser.add_argument("--skip_base_model", action="store_true", help="Skip base-model (no adapter) inference column")
     return parser.parse_args()
 
 
