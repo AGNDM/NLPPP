@@ -1,6 +1,6 @@
 # NLPPP: NLP Research RAG Pipeline
 
-A pipeline for NLP research that utilizes a Retrieval-Augmented Generation (RAG) pipeline to answer questions about research papers. It features query rewriting, dual-mode retrieval (Dense & BM25), contradiction detection (NLI), and grounded answer generation.
+A Retrieval-Augmented Generation (RAG) pipeline to answer questions about NLP questions. It features query rewriting, dual-mode retrieval (Dense & BM25), contradiction detection (NLI), and grounded answer generation with fine-tuned model.
 
 ## 🚀 Key Features
 
