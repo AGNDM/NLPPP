@@ -17,7 +17,7 @@ This project uses [uv](https://github.com/astral-sh/uv) for fast, reliable depen
 
 ```bash
 # Clone the repository
-git clone <repo-url>
+git clone https://github.com/AGNDM/NLPPP.git
 cd NLPPP
 
 # Sync dependencies
