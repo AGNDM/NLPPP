@@ -137,13 +137,10 @@ def _build_prompt(
     )
 
     prompt = f"""\
-    You are a scientific assistant specialising in NLP research.
+    You are a scientific assistant specialising in NLP research and providing the user with existing work on the topic of the user question.
 
-    Answer the question using the retrieved papers as your primary source. \
+    Answer the question using the retrieved paper(s) as your primary source. \
     If the papers are relevant, ground your answer in them. \
-    If they are irrelevant or insufficient, use your own knowledge instead and IGNORE THEM. \
-    If you genuinely do not know, say so. \
-    Never mention the papers, the retrieval process, or your sources in your answer.
     {conciseness_instruction}
     Question:
     {query}
