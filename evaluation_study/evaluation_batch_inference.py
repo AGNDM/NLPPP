@@ -1,4 +1,39 @@
-# This script performs batch inference across multiple LoRA checkpoints on multiple GPUs, and saves the generated outputs and perplexity scores to a parquet file. 
+"""
+batch_inference.py
+------------------
+Batch inference across multiple LoRA checkpoints on multiple GPUs.
+
+For each checkpoint discovered under --adapter_root, generates model outputs
+and computes perplexity scores for every row in the input parquet file.
+Results are appended as new columns and written to the output parquet file.
+
+Checkpoints are distributed across GPUs in round-robin order. Each GPU runs
+in a separate subprocess (spawned via multiprocessing) to avoid CUDA
+re-initialisation issues. Per-GPU results are written to temporary parquet
+files and merged into the final output after all workers complete.
+
+Optionally runs base model inference (no adapter) on GPU 0 before processing
+checkpoints, controlled via --skip_base_model.
+
+Usage:
+    python batch_inference.py \\
+        --input_parquet eval_sc1_inference.parquet \\
+        --output_parquet results.parquet \\
+        --adapter_root tulu_qasper_lora_output \\
+        --num_gpus 4 \\
+        --start_checkpoint 10 \\
+        --end_checkpoint 130 \\
+        --checkpoint_step 10
+
+Output:
+    Output parquet contains all original columns plus, per checkpoint:
+        output_checkpoint_{N}       — generated text
+        output_checkpoint_{N}_ppl   — perplexity score
+    And optionally:
+        output_base_model           — base model generated text
+        output_base_model_ppl       — base model perplexity
+"""
+
 from __future__ import annotations
 import argparse
 import gc
@@ -17,6 +52,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse and return command-line arguments."""
     parser = argparse.ArgumentParser(description="Run LoRA checkpoint inference across multiple GPUs.")
     parser.add_argument("--input_parquet", type=str, default="eval_sc1_inference.parquet", help="Input parquet file or directory")
     parser.add_argument("--output_parquet", type=str, default="batch_inference_results.parquet", help="Output parquet file")
@@ -40,6 +76,21 @@ def parse_args() -> argparse.Namespace:
 
 
 def _discover_checkpoints(adapter_root: str, start: int, end: int, step: int) -> List[Path]:
+    """
+    Discover checkpoint directories under adapter_root within the given range.
+
+    Args:
+        adapter_root: Root directory containing checkpoint-N subdirectories.
+        start:        First checkpoint number to include.
+        end:          Last checkpoint number to include (inclusive).
+        step:         Step size between checkpoint numbers.
+
+    Returns:
+        Sorted list of existing checkpoint Paths.
+
+    Raises:
+        FileNotFoundError: If no matching checkpoints are found.
+    """
     root = Path(adapter_root)
     checkpoints = []
     for checkpoint in range(start, end + 1, step):
@@ -52,10 +103,33 @@ def _discover_checkpoints(adapter_root: str, start: int, end: int, step: int) ->
 
 
 def _chunk_round_robin(items: List[Path], num_chunks: int) -> List[List[Path]]:
+    """
+    Distribute items across num_chunks buckets in round-robin order.
+
+    Args:
+        items:      List of checkpoint paths to distribute.
+        num_chunks: Number of buckets (typically number of GPUs).
+
+    Returns:
+        List of num_chunks sublists, each containing the items assigned
+        to that bucket.
+    """
     return [items[i::num_chunks] for i in range(num_chunks)]
 
 
-def _prepare_tokenizer(model_name: str):
+def _prepare_tokenizer(model_name: str) -> AutoTokenizer:
+    """
+    Load and configure a tokenizer for left-padded batch generation.
+
+    Sets pad_token to eos_token if not already set, and configures
+    left-padding for correct batch generation with causal models.
+
+    Args:
+        model_name: HuggingFace model identifier.
+
+    Returns:
+        Configured AutoTokenizer instance.
+    """
     tokenizer = AutoTokenizer.from_pretrained(model_name, use_fast=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
@@ -63,7 +137,25 @@ def _prepare_tokenizer(model_name: str):
     return tokenizer
 
 
-def _load_model(model_name: str, target_device: int, checkpoint_path: Path | None = None):
+def _load_model(
+        model_name: str,
+        target_device: int,
+        checkpoint_path: Path | None = None
+) -> AutoModelForCausalLM:
+    """
+    Load a base model and optionally attach a LoRA adapter.
+
+    Selects bfloat16 if supported, otherwise falls back to float16.
+    Places the model on the specified GPU device.
+
+    Args:
+        model_name:      HuggingFace base model identifier.
+        target_device:   CUDA device index to load the model onto.
+        checkpoint_path: If provided, attaches the LoRA adapter from this path.
+
+    Returns:
+        The loaded model in eval mode with caching enabled.
+    """
     dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float16
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
@@ -80,6 +172,12 @@ def _load_model(model_name: str, target_device: int, checkpoint_path: Path | Non
 
 
 def _cleanup_model(model) -> None:
+    """
+    Delete a model and free its GPU memory.
+
+    Args:
+        model: The model to delete and clean up.
+    """
     del model
     gc.collect()
     if torch.cuda.is_available():
@@ -87,6 +185,17 @@ def _cleanup_model(model) -> None:
 
 
 def _truncate_for_log(text: str, max_chars: int) -> str:
+    """
+    Truncate and flatten text for safe single-line debug logging.
+
+    Args:
+        text:      The string to truncate.
+        max_chars: Maximum number of characters to retain.
+
+    Returns:
+        The flattened string, truncated to max_chars with '...' appended
+        if truncation occurred.
+    """
     text = text.replace("\n", "\\n")
     if len(text) <= max_chars:
         return text
@@ -94,6 +203,16 @@ def _truncate_for_log(text: str, max_chars: int) -> str:
 
 
 def _debug_gpu_memory(gpu_id: int, stage: str, debug: bool) -> None:
+    """
+    Print GPU memory statistics at a given pipeline stage.
+
+    No-op if debug is False or CUDA is unavailable.
+
+    Args:
+        gpu_id: CUDA device index to query.
+        stage:  Label identifying the pipeline stage (used in log output).
+        debug:  If False, this function does nothing.
+    """
     if not debug:
         return
     pid = os.getpid()
@@ -114,6 +233,20 @@ def _debug_gpu_memory(gpu_id: int, stage: str, debug: bool) -> None:
 
 
 def _format_prompts(tokenizer, prompts: List[str], use_chat_template: bool) -> List[str]:
+    """
+    Optionally wrap raw prompts in the tokenizer's chat template.
+
+    Falls back to returning raw prompts if the tokenizer has no chat template,
+    with a warning logged to stdout.
+
+    Args:
+        tokenizer:         The tokenizer whose chat template to apply.
+        prompts:           List of raw input prompt strings.
+        use_chat_template: If False, prompts are returned unchanged.
+
+    Returns:
+        List of formatted prompt strings, one per input prompt.
+    """
     if not use_chat_template:
         return prompts
     if not hasattr(tokenizer, "apply_chat_template") or tokenizer.chat_template is None:
@@ -236,6 +369,26 @@ def _generate_with_model(
     log_prefix: str = "",
     compute_perplexity: bool = True,
 ) -> tuple[List[str], List[float]]:
+    """
+    Run batched generation and optionally compute perplexity for all prompts.
+
+    Args:
+        model:               The language model to generate with.
+        tokenizer:           The tokenizer for encoding prompts and decoding outputs.
+        prompts:             List of formatted input prompt strings.
+        batch_size:          Number of prompts to process per forward pass.
+        max_new_tokens:      Maximum number of tokens to generate per prompt.
+        temperature:         Sampling temperature; 0 enables greedy decoding.
+        top_p:               Nucleus sampling top-p value.
+        debug:               If True, logs generation progress to stdout.
+        debug_every_batches: Log frequency in batches when debug is True.
+        log_prefix:          String prepended to all debug log lines.
+        compute_perplexity:  If False, perplexity scores are returned as 0.0.
+
+    Returns:
+        2-tuple of (outputs, perplexities), where outputs is a list of decoded
+        strings and perplexities is a list of float scores, one per prompt.
+    """
     do_sample = temperature > 0
     generation_config = GenerationConfig(
         max_new_tokens=max_new_tokens,
@@ -245,6 +398,7 @@ def _generate_with_model(
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
     )
+    
 
     outputs: List[str] = []
     total_batches = (len(prompts) + batch_size - 1) // batch_size
@@ -315,6 +469,30 @@ def _worker(
     debug_chars: int,
     output_path: str,
 ) -> None:
+    """
+    Subprocess worker that runs inference for an assigned set of checkpoints on one GPU.
+
+    Reads the full input parquet, runs generation for each assigned checkpoint
+    (and optionally the base model on GPU 0), and writes results to a temporary
+    parquet file for later merging by main().
+
+    Args:
+        gpu_id:             CUDA device index this worker is assigned to.
+        checkpoint_paths:   List of checkpoint paths assigned to this GPU.
+        input_parquet:      Path to the input parquet file.
+        model_name:         HuggingFace base model identifier.
+        batch_size:         Generation batch size.
+        max_new_tokens:     Maximum tokens to generate per prompt.
+        temperature:        Sampling temperature.
+        top_p:              Nucleus sampling top-p.
+        include_base_model: If True and gpu_id == 0, run base model inference first.
+        base_output_column: Column name for base model outputs.
+        use_chat_template:  Whether to wrap prompts in the chat template.
+        debug:              If True, log verbose debug output.
+        debug_samples:      Number of sample outputs to preview in debug logs.
+        debug_chars:        Maximum characters per debug preview string.
+        output_path:        Path to write this worker's partial parquet output.
+    """
     os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
     if torch.cuda.is_available():
@@ -408,6 +586,7 @@ def _worker(
 
 
 def main() -> None:
+    """Parse arguments, distribute checkpoints across GPU workers, and merge results."""
     args = parse_args()
     input_table = pq.read_table(args.input_parquet)
     num_rows = input_table.num_rows
