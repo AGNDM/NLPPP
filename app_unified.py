@@ -1,3 +1,18 @@
+"""
+app.py
+------
+Streamlit frontend for the NLP Research Assistant.
+
+Provides two pipeline modes selectable from the sidebar:
+    - Dense RAG QA: full pipeline with query rewriting, SPECTER 2 retrieval,
+      relevance grading, contradiction detection, and answer generation.
+    - BM25 Baseline: retrieval-only baseline using BM25 keyword search,
+      with no rewriting, grading, or answer generation.
+
+Run with:
+    streamlit run app.py
+"""
+
 import streamlit as st
 
 from pipeline.rewrite import rewrite_query
@@ -6,12 +21,11 @@ from pipeline.rag_bm25 import retrieve as bm25_retrieve
 from pipeline.grade import grade_chunks
 from pipeline.nli import detect_contradictions_node
 from pipeline.generate import generate_answer
+from pipeline.state import RAGState
 
-# st.set_page_config(page_title="NLP Paper QA", layout="centered")
-# st.title("NLP Research Assistant")
-# st.caption("Ask a question about NLP research. The pipeline retrieves relevant papers, checks for contradictions, and generates an answer.")
 
-def init_dense_state(query: str) -> dict:
+def init_dense_state(query: str) -> RAGState:
+    """Initialise a blank RAGState for the dense RAG pipeline."""
     return {
         "original_query": query,
         "rewritten_query": "",
@@ -22,30 +36,30 @@ def init_dense_state(query: str) -> dict:
     }
 
 
-def init_bm25_state(query: str) -> dict:
+def init_bm25_state(query: str) -> RAGState:
+    """
+    Initialise a blank RAGState for the BM25 baseline.
+
+    BM25 retrieval uses the raw query directly, so rewritten_query and
+    rewritten_user_question are pre-populated with the original query.
+    """
     return {
         "original_query": query,
-        "rewritten_query": query,   # BM25 uses raw query directly
+        "rewritten_query": query,
         "rewritten_user_question": query,
         "retrieved_chunks": [],
         "contradiction_pairs": [],
         "answer": "",
     }
 
-# query = st.chat_input("Ask a question...")
-# if query:
-#     with st.chat_message("user"):
-#         st.write(query)
 
-#     state = {
-#         "original_query": query,
-#         "rewritten_query": "",
-#         "rewritten_user_question": "",
-#         "retrieved_chunks": [],
-#         "contradiction_pairs": [],
-#         "answer": "",
-#     }
 def render_dense_rag(query: str) -> None:
+    """
+    Render the full dense RAG pipeline response for a given query.
+
+    Runs each pipeline stage sequentially and surfaces intermediate outputs
+    via st.status blocks so the user can follow along in real time.
+    """
     state = init_dense_state(query)
 
     with st.chat_message("assistant"):
@@ -79,9 +93,9 @@ def render_dense_rag(query: str) -> None:
             for chunk in all_chunks:
                 title = chunk.payload.get("title", "Untitled")
                 if title in graded_titles:
-                    st.write(f"{title}")
+                    st.markdown(f":green[{title}]")
                 else:
-                    st.write(f"{title}")
+                    st.markdown(f":red[{title}]")
 
         # Step 4: Contradiction detection
         with st.status("Checking for contradictions..."):
@@ -92,7 +106,7 @@ def render_dense_rag(query: str) -> None:
                 for i, j in pairs:
                     title_i = graded_chunks[i].payload.get("title", f"Paper {i + 1}")
                     title_j = graded_chunks[j].payload.get("title", f"Paper {j + 1}")
-                    st.write(f"- **[{i + 1}] {title_i}** contradicts **[{j + 1}] {title_j}**")
+                    st.markdown(f"- **[{i + 1}] {title_i}** contradicts **[{j + 1}] {title_j}**")
             else:
                 st.success("No contradictions detected")
 
@@ -104,6 +118,12 @@ def render_dense_rag(query: str) -> None:
 
 
 def render_bm25_baseline(query: str) -> None:
+    """
+    Render the BM25 retrieval-only baseline response for a given query.
+
+    Retrieves the top-k chunks using BM25 keyword search and displays them
+    with their scores. No rewriting, grading, or answer generation is performed.
+    """
     state = init_bm25_state(query)
 
     with st.chat_message("assistant"):
@@ -114,7 +134,7 @@ def render_bm25_baseline(query: str) -> None:
             if not chunks:
                 st.warning("No chunks retrieved.")
             else:
-                st.write(f"Returned **{len(chunks)}** top chunks:")
+                st.markdown(f"Returned **{len(chunks)}** top chunks:")
                 for i, chunk in enumerate(chunks):
                     title = chunk.payload.get("title", f"Paper {i + 1}")
                     abstract = chunk.payload.get("abstract", "")
@@ -125,6 +145,7 @@ def render_bm25_baseline(query: str) -> None:
 
 
 def main() -> None:
+    """Configure and launch the Streamlit app."""
     st.set_page_config(page_title="NLP Paper QA", layout="centered")
     st.title("NLP Research Assistant")
     mode = st.sidebar.selectbox(
