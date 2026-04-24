@@ -1,3 +1,22 @@
+"""
+retrieve_and_append.py
+----------------------
+Runs BM25 and/or dense retrieval over the evaluation parquet files and
+appends the results as new columns in-place.
+
+For each row in sc1_output.parquet and/or sc2_output.parquet, retrieves the
+top-k most similar documents from the shared corpus and writes the doc IDs,
+titles, texts, and scores back into the parquet file. Columns are named
+{retriever}_topk_{doc_ids|titles|texts|scores}.
+
+Skips files where the target columns already exist unless --overwrite is passed.
+Supports partial runs via --limit for debugging.
+
+Usage:
+    python retrieve_and_append.py --retriever both --top_k 5
+    python retrieve_and_append.py --retriever bm25 --files sc1 --limit 10 --overwrite
+"""
+
 from __future__ import annotations
 
 import argparse
@@ -22,6 +41,21 @@ SHARED_CORPUS_PATH = DATA_DIR / "shared_corpus.json"
 
 
 def extract_question_column(df: pd.DataFrame, parquet_name: str) -> str:
+    """Detect which column in the dataframe contains the question text.
+
+    Tries a fixed list of candidate column names in order and returns the
+    first match. Raises KeyError if none are found.
+
+    Args:
+        df:           The evaluation dataframe.
+        parquet_name: Filename used in the error message for clarity.
+
+    Returns:
+        The name of the question column found in the dataframe.
+
+    Raises:
+        KeyError: If none of the candidate column names exist in the dataframe.
+    """
     candidates = ["question", "prompt", "query", "input"]
     for col in candidates:
         if col in df.columns:
@@ -33,7 +67,19 @@ def extract_question_column(df: pd.DataFrame, parquet_name: str) -> str:
     )
 
 
-def retrieval_lists(results: list[dict[str, Any]]) -> tuple[list[str], list[str], list[str], list[float]]:
+def retrieval_lists(
+        results: list[dict[str, Any]]
+) -> tuple[list[str], list[str], list[str], list[float]]:
+    """
+    Unzip a list of retrieval result dicts into four parallel lists.
+
+    Args:
+        results: List of retrieval result dicts, each containing
+                 doc_id, title, text, and score fields.
+
+    Returns:
+        4-tuple of (doc_ids, titles, texts, scores).
+    """
     doc_ids = [str(r.get("doc_id", "") or "") for r in results]
     titles = [str(r.get("title", "") or "") for r in results]
     texts = [str(r.get("text", "") or "") for r in results]
@@ -49,6 +95,24 @@ def process_parquet(
     overwrite: bool = False,
     limit: int | None = None,
 ) -> None:
+    """
+    Run a retriever over all rows in a parquet file and append results as new columns.
+
+    Retrieves the top-k documents for each question in the parquet file and
+    writes four new columns back to disk: doc IDs, titles, texts, and scores.
+    Skips processing if the target columns already exist and overwrite is False.
+
+    Args:
+        path:           Path to the parquet file to process.
+        retriever_name: Label used for column prefixes and log output
+                        (e.g. 'bm25' or 'dense').
+        retriever_fn:   Callable that takes (query, top_k) and returns a list
+                        of retrieval result dicts.
+        top_k:          Number of results to retrieve per query.
+        overwrite:      If True, recompute and overwrite existing columns.
+        limit:          If set, only process the first N rows. Remaining rows
+                        receive empty lists.
+    """
     print(f"\n[{retriever_name}] Loading {path}")
     df = pd.read_parquet(path)
 
@@ -107,6 +171,7 @@ def process_parquet(
 
 
 def main() -> None:
+    """Parse arguments and run retrieval over the selected evaluation files."""
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--retriever",
