@@ -28,8 +28,8 @@ You are a retrieval optimisation assistant. Given a user question, produce two o
    A clean, detailed, self-contained version of the user's question suitable for an LLM to answer.
    Keep it as a natural question but remove all colloquialisms and vagueness.
    Add relevant technical context if it is clearly implied by the original question.
-   Example: "How does the multihead attention mechanism work in transformer architectures, \
-and what is the role of the individual attention heads?"
+   However, do NOT add information or extend the question with another question. 
+   Also encode the answer instructions of the user question such as "Explain like I'm five" or "Explain concisely".
 
 IMPORTANT: Your entire response must be exactly one line in this format and nothing else:
 <retrieval_query> | <rewritten_question>
