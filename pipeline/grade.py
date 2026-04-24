@@ -22,6 +22,8 @@ Your job is to decide whether the abstract below contains information that \
 directly and specifically helps answer the question. \
 Domain similarity is NOT enough — the abstract must contain facts, findings, \
 or details that the downstream answering model can actually use to answer the question.
+When grading, lean towards marking borderline cases as "relevant" to avoid filtering out potentially useful information, 
+but do not mark clearly irrelevant abstracts as relevant.
 
 Reply with a single word: YES (for relevant) or NO (for not relevant). Nothing else.
 
