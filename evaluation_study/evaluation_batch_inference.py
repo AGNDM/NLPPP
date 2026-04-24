@@ -42,7 +42,6 @@ import os
 import tempfile
 import time
 from pathlib import Path
-from typing import List
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -75,7 +74,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _discover_checkpoints(adapter_root: str, start: int, end: int, step: int) -> List[Path]:
+def _discover_checkpoints(adapter_root: str, start: int, end: int, step: int) -> list[Path]:
     """
     Discover checkpoint directories under adapter_root within the given range.
 
@@ -102,16 +101,16 @@ def _discover_checkpoints(adapter_root: str, start: int, end: int, step: int) ->
     return checkpoints
 
 
-def _chunk_round_robin(items: List[Path], num_chunks: int) -> List[List[Path]]:
+def _chunk_round_robin(items: list[Path], num_chunks: int) -> list[list[Path]]:
     """
     Distribute items across num_chunks buckets in round-robin order.
 
     Args:
-        items:      List of checkpoint paths to distribute.
+        items:      list of checkpoint paths to distribute.
         num_chunks: Number of buckets (typically number of GPUs).
 
     Returns:
-        List of num_chunks sublists, each containing the items assigned
+        list of num_chunks sublists, each containing the items assigned
         to that bucket.
     """
     return [items[i::num_chunks] for i in range(num_chunks)]
@@ -232,7 +231,7 @@ def _debug_gpu_memory(gpu_id: int, stage: str, debug: bool) -> None:
     )
 
 
-def _format_prompts(tokenizer, prompts: List[str], use_chat_template: bool) -> List[str]:
+def _format_prompts(tokenizer, prompts: list[str], use_chat_template: bool) -> list[str]:
     """
     Optionally wrap raw prompts in the tokenizer's chat template.
 
@@ -241,11 +240,11 @@ def _format_prompts(tokenizer, prompts: List[str], use_chat_template: bool) -> L
 
     Args:
         tokenizer:         The tokenizer whose chat template to apply.
-        prompts:           List of raw input prompt strings.
+        prompts:           list of raw input prompt strings.
         use_chat_template: If False, prompts are returned unchanged.
 
     Returns:
-        List of formatted prompt strings, one per input prompt.
+        list of formatted prompt strings, one per input prompt.
     """
     if not use_chat_template:
         return prompts
@@ -266,21 +265,21 @@ def _format_prompts(tokenizer, prompts: List[str], use_chat_template: bool) -> L
 def _compute_perplexities(
     model,
     tokenizer,
-    prompts: List[str],
-    outputs: List[str],
+    prompts: list[str],
+    outputs: list[str],
     batch_size: int = 4,
-) -> List[float]:
+) -> list[float]:
     """Compute perplexity for each generated output.
     
     Args:
         model: The language model
         tokenizer: The tokenizer
-        prompts: List of original prompts
-        outputs: List of generated outputs
+        prompts: list of original prompts
+        outputs: list of generated outputs
         batch_size: Batch size for evaluation
         
     Returns:
-        List of perplexity scores (one per output)
+        list of perplexity scores (one per output)
     """
     perplexities = []
     
@@ -359,7 +358,7 @@ def _compute_perplexities(
 def _generate_with_model(
     model,
     tokenizer,
-    prompts: List[str],
+    prompts: list[str],
     batch_size: int,
     max_new_tokens: int,
     temperature: float,
@@ -368,14 +367,14 @@ def _generate_with_model(
     debug_every_batches: int = 10,
     log_prefix: str = "",
     compute_perplexity: bool = True,
-) -> tuple[List[str], List[float]]:
+) -> tuple[list[str], list[float]]:
     """
     Run batched generation and optionally compute perplexity for all prompts.
 
     Args:
         model:               The language model to generate with.
         tokenizer:           The tokenizer for encoding prompts and decoding outputs.
-        prompts:             List of formatted input prompt strings.
+        prompts:             list of formatted input prompt strings.
         batch_size:          Number of prompts to process per forward pass.
         max_new_tokens:      Maximum number of tokens to generate per prompt.
         temperature:         Sampling temperature; 0 enables greedy decoding.
@@ -400,7 +399,7 @@ def _generate_with_model(
     )
     
 
-    outputs: List[str] = []
+    outputs: list[str] = []
     total_batches = (len(prompts) + batch_size - 1) // batch_size
     start_time = time.time()
 
@@ -454,7 +453,7 @@ def _generate_with_model(
 
 def _worker(
     gpu_id: int,
-    checkpoint_paths: List[Path],
+    checkpoint_paths: list[Path],
     input_parquet: str,
     model_name: str,
     batch_size: int,
@@ -478,7 +477,7 @@ def _worker(
 
     Args:
         gpu_id:             CUDA device index this worker is assigned to.
-        checkpoint_paths:   List of checkpoint paths assigned to this GPU.
+        checkpoint_paths:   list of checkpoint paths assigned to this GPU.
         input_parquet:      Path to the input parquet file.
         model_name:         HuggingFace base model identifier.
         batch_size:         Generation batch size.
