@@ -1,3 +1,20 @@
+"""
+generate.py
+-----------
+LangGraph node for answer generation using a fine-tuned Tulu model.
+
+Loads the base Tulu model once at import time and optionally attaches a LoRA
+adapter (controlled by USE_LORA in constants.py). At inference time, builds a
+prompt from the rewritten user question, retrieved paper abstracts, and any
+detected contradiction pairs, then runs generation and returns the answer.
+
+The model is loaded once at module import rather than per-query — reloading
+would take several minutes per call. On CUDA, 4-bit quantisation is applied
+via BitsAndBytes to reduce memory usage. MPS and CPU are also supported.
+
+Device selection priority: CUDA → MPS → CPU.
+"""
+
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from peft import PeftModel
@@ -6,10 +23,8 @@ from pipeline.state import RAGState
 from pipeline.constants import GENERATE_BASE_MODEL, GENERATE_LORA_ADAPTER, USE_LORA
 
 
-def _load_model():
-    """
-    Load the base Tulu model and attach the LoRA adapter.
-    """
+def _load_model() -> tuple[PeftModel | AutoModelForCausalLM, AutoTokenizer]:
+    """Load the base Tulu model and attach the LoRA adapter."""
     if torch.cuda.is_available():
         device = "cuda"
     elif torch.backends.mps.is_available():
@@ -93,6 +108,7 @@ def _build_prompt(
     abstracts: list[str],
     contradiction_pairs: list[tuple[int, int]],
 ) -> str:
+    """Assemble the prompt sent to the model at inference time."""
     context_block = "\n\n".join(
         f"[{i + 1}] {abstract}" for i, abstract in enumerate(abstracts)
     )
@@ -150,7 +166,6 @@ def generate_answer(state: RAGState) -> dict:
         abstracts=abstracts,
         contradiction_pairs=state["contradiction_pairs"],
     )
-
 
     print(prompt)
     print("\n")

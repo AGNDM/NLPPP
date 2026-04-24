@@ -1,3 +1,9 @@
+"""
+helpers.py
+----------
+Shared embedding and Qdrant utilities used across the RAG pipeline.
+"""
+
 import os
 import torch
 import numpy as np
@@ -5,6 +11,8 @@ from dotenv import load_dotenv
 from transformers import AutoTokenizer
 from adapters import AutoAdapterModel
 from qdrant_client import QdrantClient
+from qdrant_client.models import ScoredPoint
+
 
 load_dotenv()
 
@@ -14,7 +22,8 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 # ── Load embedding model ──────────────────────────────────────────────────────
 
 def load_embedding_model() -> tuple[AutoTokenizer, AutoAdapterModel]:
-    """Load the SPECTER 2 model and tokenizer, and return them for reuse.
+    """
+    Load the SPECTER 2 model and tokenizer, and return them for reuse.
 
     Returns:
         tokenizer: The SPECTER 2 tokenizer.
@@ -30,8 +39,13 @@ def load_embedding_model() -> tuple[AutoTokenizer, AutoAdapterModel]:
 
 # ── Document Embedding helper ──────────────────────────────────────────────────────────
 
-def embed_document(texts: list[str], tokenizer: AutoTokenizer, model: AutoAdapterModel) -> np.ndarray:
-    """Convert a list(!) of texts to SPECTER 2 embeddings.
+def embed_document(
+        texts: list[str],
+        tokenizer: AutoTokenizer,
+        model: AutoAdapterModel
+    ) -> np.ndarray:
+    """
+    Convert a list(!) of texts to SPECTER 2 embeddings.
 
     Args:
         texts (list[str]): A list of strings to embed. E.g. ["Title [SEP] Abstract", ...]
@@ -58,7 +72,8 @@ def embed_document(texts: list[str], tokenizer: AutoTokenizer, model: AutoAdapte
 # ── Query Embedding helper ─────────────────────────────────────────────────────────
 
 def load_query_model() -> tuple[AutoTokenizer, AutoAdapterModel]:
-    """Load SPECTER2 with the adhoc_query adapter for embedding user queries.
+    """
+    Load SPECTER2 with the adhoc_query adapter for embedding user queries.
     
     This is intentionally separate from load_embedding_model() — documents and
     queries need different adapters for asymmetric retrieval to work correctly.
@@ -66,14 +81,16 @@ def load_query_model() -> tuple[AutoTokenizer, AutoAdapterModel]:
     print("Loading SPECTER2 query model...")
     tokenizer = AutoTokenizer.from_pretrained("allenai/specter2_base")
     model = AutoAdapterModel.from_pretrained("allenai/specter2_base")
-    model.load_adapter("allenai/specter2_adhoc_query", source="hf", load_as="adhoc_query", set_active=True)
+    model.load_adapter(
+        "allenai/specter2_adhoc_query", source="hf", load_as="adhoc_query", set_active=True)
     model.eval()
     print("  → Query model ready\n")
     return tokenizer, model
 
 
 def embed_query(text: str, tokenizer: AutoTokenizer, model: AutoAdapterModel) -> np.ndarray:
-    """Embed a single user query using the adhoc_query adapter.
+    """
+    Embed a single user query using the adhoc_query adapter.
 
     Args:
         text (str): The user's (rewritten) query string.
@@ -97,6 +114,12 @@ def embed_query(text: str, tokenizer: AutoTokenizer, model: AutoAdapterModel) ->
 # ── Connect to Qdrant ─────────────────────────────────────────────────────────
 
 def get_qdrant_client() -> QdrantClient:
+    """
+    Initialise and return a Qdrant client using environment credentials.
+
+    Returns:
+        QdrantClient: A connected client instance ready for querying.
+    """
     print("Connecting to Qdrant...")
     client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
     print("  → Connected\n")
@@ -105,17 +128,26 @@ def get_qdrant_client() -> QdrantClient:
 # ── Query VectorDB ─────────────────────────────────────────────────────────
 
 
-def query_vector_db(client: QdrantClient, query_embedding: np.ndarray, collection_name: str = "nlp_papers", top_k: int = 3, with_vectors: bool = False) -> list:
-    """Query the vector database for similar papers.
-    
+def query_vector_db(
+        client: QdrantClient,
+        query_embedding: np.ndarray,
+        collection_name: str = "nlp_papers",
+        top_k: int = 3,
+        with_vectors: bool = False
+    ) -> list[ScoredPoint]:
+    """
+    Query the vector database for similar papers.
+
     Args:
         client (QdrantClient): An instance of the Qdrant client.
         query_embedding (np.ndarray): The embedding vector for the user's query.
         collection_name (str): The name of the Qdrant collection to search.
         top_k (int): The number of top results to return.
-        
+        with_vectors (bool): Whether to include the raw vectors in the results.
+            Defaults to False; set True for debugging or re-ranking.
+
     Returns:
-        list: A list of search results with metadata.
+        list[ScoredPoint]: A list of search results with metadata.
     """
     results = client.query_points(
         collection_name=collection_name,

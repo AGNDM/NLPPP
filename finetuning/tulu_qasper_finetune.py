@@ -1,15 +1,38 @@
+"""
+train_qasper.py
+---------------
+LoRA fine-tuning script for the Tulu 3 8B model on the QASPER dataset.
+
+Fine-tunes allenai/Llama-3.1-Tulu-3-8B using LoRA (via PEFT) and supervised
+fine-tuning (via TRL's SFTTrainer) on a preprocessed QASPER parquet file.
+Only the assistant's response tokens contribute to the loss, enforced via
+DataCollatorForCompletionOnlyLM.
+
+Supports multi-GPU training via PyTorch DistributedDataParallel (DDP).
+LOCAL_RANK is read from the environment and used for device placement.
+
+Usage:
+    Single GPU:
+        python train_qasper.py
+
+    Multi-GPU (DDP):
+        torchrun --nproc_per_node=<N> train_qasper.py
+
+Output:
+    ./tulu_qasper_lora_output/   — checkpoints saved every 10 steps
+    ./tulu_qasper_lora_final/    — final LoRA adapters
+"""
+
 import torch
 from datasets import load_dataset
-from transformers import (
-    AutoModelForCausalLM,
-    AutoTokenizer,
-    TrainingArguments,
-)
+from transformers import AutoModelForCausalLM, AutoTokenizer
 import os
 from peft import LoraConfig, get_peft_model
 from trl import SFTTrainer, SFTConfig, DataCollatorForCompletionOnlyLM
 
-def main():
+
+def main() -> None:
+    """Run the full LoRA fine-tuning pipeline on QASPER."""
     # 1. Load Dataset
     dataset_path = "./data/qasper/processed/finetuning_dataset_final.parquet"
     print(f"Loading dataset from {dataset_path}...")
@@ -36,7 +59,22 @@ def main():
 
     # Convert the dataset to the model's chat format
     print("Formatting dataset with chat template and tokenizing...")
-    def create_prompt(example):
+
+
+    def create_prompt(example: dict) -> dict:
+        """
+        Format a single QASPER example into Tulu 3's chat template.
+
+        Constructs a user/assistant message pair, applies the tokenizer's
+        chat template, and tokenizes the result. Only the assistant turn
+        contributes to the loss — enforced by the data collator.
+
+        Args:
+            example: A dataset row with 'input' and 'answer' fields.
+
+        Returns:
+            Tokenized dict with 'input_ids' and 'attention_mask'.
+        """
         messages = [
             {"role": "user", "content": str(example["input"])},
             {"role": "assistant", "content": example["answer"]}

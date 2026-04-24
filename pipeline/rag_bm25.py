@@ -1,17 +1,30 @@
-# pipeline/rag_bm25.py
+"""
+rag_bm25.py
+-----------
+BM25 retrieval node for the RAG pipeline, used as a lexical baseline
+against the dense SPECTER 2 retrieval in rag.py.
+
+Loads all records from the Qdrant collection at import time, builds a BM25
+index over the combined title, abstract, author, venue, and year fields, and
+exposes a retrieve() node with the same interface as the dense pipeline so
+that downstream nodes (grading, contradiction detection, generation) remain
+unchanged.
+
+BM25ScoredChunk mimics the ScoredPoint interface expected by downstream nodes,
+with a vector field included for compatibility with the NLI cosine similarity
+pre-filter (though BM25 ranking itself is purely lexical).
+"""
 
 from __future__ import annotations
-
 import re
 from dataclasses import dataclass
 from typing import Any
-
 from dotenv import load_dotenv
 from rank_bm25 import BM25Okapi
-
 from rag_QA.vectorDB.helpers import get_qdrant_client
 from pipeline.state import RAGState
 from pipeline.constants import RETRIEVAL_COLLECTION, RETRIEVAL_TOP_K
+from qdrant_client import QdrantClient
 
 load_dotenv()
 
@@ -33,10 +46,12 @@ class BM25ScoredChunk:
 
 
 def _tokenize(text: str) -> list[str]:
+    """Lowercase and tokenize text into word tokens for BM25 indexing."""
     return re.findall(r"\b\w+\b", (text or "").lower())
 
 
 def _build_doc_text(payload: dict) -> str:
+    """Concatenate all lexical fields from a Qdrant payload into a single string for BM25."""
     title = payload.get("title", "") or ""
     abstract = payload.get("abstract", "") or ""
     authors = payload.get("authors", "") or ""
@@ -46,7 +61,7 @@ def _build_doc_text(payload: dict) -> str:
     return f"{title} {abstract} {authors} {venue} {year}".strip()
 
 
-def _load_collection_records(client, collection_name: str) -> list[Any]:
+def _load_collection_records(client: QdrantClient, collection_name: str) -> list[Any]:
     """
     Load all records from Qdrant once and keep payload/vector available.
     This keeps the corpus identical to the current dense pipeline,
@@ -90,7 +105,7 @@ _bm25 = BM25Okapi(_corpus_tokens)
 print(f"[bm25] indexed {len(_records)} papers from Qdrant collection '{RETRIEVAL_COLLECTION}'")
 
 
-def retrieve(state: RAGState) -> dict:
+def retrieve(state: RAGState) -> dict[str, list[BM25ScoredChunk]]:
     """
     BM25 replacement for the dense retrieve() node.
 

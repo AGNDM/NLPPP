@@ -1,3 +1,26 @@
+"""
+evaluate_nli.py
+---------------
+Evaluates a HuggingFace NLI model against a labelled set of test cases.
+
+Runs each (abstract_a, abstract_b) pair through the specified NLI model and
+compares predicted labels against ground truth. Results are reported overall
+and broken down by category, with individual failures listed for inspection.
+
+Used to select and validate the NLI model used in the contradiction detection
+step of the RAG pipeline before committing to it in production.
+
+Usage:
+    python evaluate.py --model cross-encoder/nli-deberta-v3-large
+    python evaluate.py --model <model> --test_cases path/to/cases.json --output results.json
+
+Input:
+    test_cases.json — labelled NLI pairs (see load_test_cases for schema)
+
+Output:
+    Printed summary to stdout, and optionally a results JSON file.
+"""
+
 import json
 import argparse
 from pathlib import Path
@@ -92,7 +115,9 @@ def print_results(results: dict) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", required=True, help="HuggingFace model name")
-    parser.add_argument("--test_cases", default="test_cases.json", help="Path to test cases JSON")
+    parser.add_argument(
+        "--test_cases", default="test_cases.json", help="Path to test cases JSON"
+    )
     parser.add_argument("--output", default=None, help="Path to save results as JSON")
     args = parser.parse_args()
     
