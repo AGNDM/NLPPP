@@ -1,0 +1,3966 @@
+{
+  "Dense": [
+    {
+      "row_idx": 0,
+      "query": "In the field of natural language processing, what is the name of the technique where a large trained model is used to supervise the training of a smaller model by having the smaller model match the output probability distributions of the larger one?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 1,
+      "query": "In the field of natural language processing, what architecture did Vaswani et al. introduce in their 2017 paper 'Attention Is All You Need'?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 2,
+      "query": "In the field of natural language processing, what is the name of the automatic evaluation metric most commonly used to assess the quality of machine translation outputs, based on n-gram precision overlap between system output and reference translations?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 3,
+      "query": "In the field of natural language processing, what does the BLEU score measure between a machine-generated translation and a human reference translation?",
+      "binary_rels": [
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 4,
+      "query": "In the field of natural language processing, what is the name of the sequence decoding strategy that maintains a fixed-size set of the most probable partial sequences at each generation step, expanding each candidate by one token and pruning back to the top candidates by cumulative log-probability?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 5,
+      "query": "In the field of natural language processing, what type of Transformer architecture does BERT use?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 6,
+      "query": "In the field of natural language processing, what is the name of BERT's primary pretraining objective, in which a random subset of input tokens is replaced with a special mask token and the model must predict the original vocabulary item at each masked position?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 7,
+      "query": "In the field of natural language processing, what is the name of the family of automatic evaluation metrics most commonly used to assess the quality of text summarization systems, based on n-gram and longest-common-subsequence overlap between system output and reference summaries?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 8,
+      "query": "In the field of natural language processing, what does the abbreviation ROUGE stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 9,
+      "query": "In the field of natural language processing, what type of Transformer architecture does the T5 model use?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 10,
+      "query": "In the field of natural language processing, what is the pretraining objective used by T5, in which contiguous spans of tokens in the input are replaced with unique sentinel tokens and the model must output the missing spans?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 11,
+      "query": "In the field of natural language processing, what does the abbreviation ELMo stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 12,
+      "query": "In the field of natural language processing, what is the pretraining objective used by XLNet, in which the model is trained to predict tokens autoregressively over all possible factorisation orders of the input sequence rather than strictly left-to-right?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 13,
+      "query": "In the field of natural language processing, what pretraining task does ALBERT use in place of BERT's next sentence prediction objective, where the model must determine whether two consecutive segments have been swapped in order?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 14,
+      "query": "In the field of natural language processing, what is the name of the machine translation evaluation metric that, unlike BLEU, accounts for stem matches and synonym matches via WordNet when comparing system output to reference translations?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 15,
+      "query": "In the field of natural language processing, what is the name of the language model evaluation metric defined as the exponentiated average negative log-likelihood per token, which measures how well a model assigns probability to a held-out text corpus?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 16,
+      "query": "In the field of natural language processing, what is the name of the small trainable feed-forward modules inserted between the frozen layers of a pre-trained Transformer during parameter-efficient task adaptation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 17,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning technique introduced by Hu et al. that injects trainable rank-decomposition matrices into the frozen weight matrices of a pre-trained language model instead of updating all parameters?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 18,
+      "query": "In the field of natural language processing, what does the acronym GPT stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 19,
+      "query": "In the field of natural language processing, which of BERT's original pretraining objectives did RoBERTa remove during its replication and improvement study, finding that it hurt rather than helped downstream performance?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 20,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention variant where the full attention computation is split across several independent heads each with its own learned projection matrices, and their outputs are concatenated before a final linear projection?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 21,
+      "query": "In the field of natural language processing, what is the name of the signal added to token embeddings in the original Transformer to convey each token's position in the sequence, compensating for the fact that self-attention is permutation-invariant?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 22,
+      "query": "In the field of natural language processing, what is the name of the word embedding model introduced by Mikolov et al. in 2013 that learns dense vector representations of words using a shallow neural network trained on either a skip-gram or continuous bag-of-words objective?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 23,
+      "query": "In the field of natural language processing, what is the name of the word embedding model by Pennington et al. that learns vector representations by factorising a matrix of global word co-occurrence counts collected from a large corpus?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 24,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric used in reading comprehension benchmarks such as SQuAD that assigns a score of 1 only when the model's predicted answer string matches the gold answer character-for-character after normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 25,
+      "query": "In the field of natural language processing, what does the acronym BERT stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 26,
+      "query": "In the field of natural language processing, what does the acronym T5 stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 27,
+      "query": "In the field of natural language processing, what is the name of the secondary pretraining objective in the original BERT paper, where the model is given two text segments and must predict whether the second segment genuinely follows the first in the original document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 28,
+      "query": "In the field of natural language processing, what is the name of the sequence-to-sequence training technique where, at each decoding step, the model receives the ground-truth token from the previous position as input rather than its own previously generated output?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 29,
+      "query": "In the field of natural language processing, what is the name of the attention mechanism introduced by Bahdanau et al. in 2015, in which the decoder at each step computes a context vector as a weighted sum of all encoder hidden states with weights determined by a learned alignment model?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 30,
+      "query": "In the field of natural language processing, what is the name of the normalisation technique applied inside each Transformer sub-layer that standardises activations across the hidden-state dimension independently for each token position?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 31,
+      "query": "In the field of natural language processing, what is the name of the two-stage training paradigm in which a neural network is first trained on a large unlabelled corpus using a self-supervised objective and then adapted to a downstream task using a smaller labelled dataset?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "row_idx": 32,
+      "query": "In the field of natural language processing, what is the name of the Transformer-based model by Beltagy et al. that replaces standard full self-attention with a combination of local sliding window attention and sparse global attention to scale to document-length inputs?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 33,
+      "query": "In the field of natural language processing, what is the name of the word embedding model by Bojanowski et al. that represents each word as the sum of its constituent character n-gram vectors, enabling the construction of embeddings for out-of-vocabulary words?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 34,
+      "query": "In the field of natural language processing, what is the name of the scalar hyperparameter used during text generation that divides the model's logits before the softmax, where lower values sharpen the output distribution and higher values flatten it?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 35,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning method introduced by Li and Liang in which a sequence of trainable continuous token embeddings is prepended to the input at every Transformer layer while the original model weights remain frozen?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 36,
+      "query": "In the field of natural language processing, what is the name of the probabilistic graphical model layer commonly placed on top of a recurrent or Transformer encoder in sequence labeling systems that captures dependencies between adjacent output labels rather than treating each prediction independently?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 37,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant that measures similarity using the longest common subsequence between the hypothesis and the reference rather than fixed-length n-gram overlap?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 38,
+      "query": "In the field of natural language processing, what does the acronym NER stand for?",
+      "binary_rels": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 39,
+      "query": "In the field of natural language processing, what does the acronym POS stand for when referring to the task of assigning a grammatical category label to each word in a sentence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 40,
+      "query": "In the field of natural language processing, what is the name of the task in which a system must identify all mentions of the same real-world entity across a document and group them into clusters?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 41,
+      "query": "In the field of natural language processing, what is the name of the syntactic analysis task in which a model must parse a sentence into a tree of directed labelled arcs representing grammatical relations between word pairs, such as subject, object, and modifier?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 42,
+      "query": "In the field of natural language processing, what is the name of the self-supervised representation learning objective used in SimCSE and other sentence embedding models, where positive pairs of semantically similar sentences are pulled together and negative pairs are pushed apart in the embedding space?",
+      "binary_rels": [
+        0,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 43,
+      "query": "In the field of natural language processing, what is the name of the deterministic text generation strategy that at each step selects the single token with the highest probability according to the model's output distribution?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 44,
+      "query": "In the field of natural language processing, what does the acronym SQuAD stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 45,
+      "query": "In the field of natural language processing, what does the acronym RAG stand for when referring to the technique of augmenting a language model's input with documents retrieved from an external corpus at inference time?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 46,
+      "query": "In the field of natural language processing, what is the name of the BERT variant by Joshi et al. that masks contiguous random spans of tokens rather than individual tokens and adds a span boundary objective that requires predicting masked span content using only the representations of the boundary tokens?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 47,
+      "query": "In the field of natural language processing, what is the name of the multi-task natural language understanding benchmark introduced in 2018 that evaluates models across nine diverse tasks including sentiment analysis, textual entailment, and question answering?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 48,
+      "query": "In the field of natural language processing, what is the name of the harder successor benchmark to GLUE, introduced in 2019 after state-of-the-art models surpassed human performance on GLUE, that includes tasks requiring multi-sentence reasoning and common-sense understanding?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 49,
+      "query": "In the field of natural language processing, what is the name given to the smaller model within the ELECTRA pretraining framework that is trained with a masked language modelling objective and produces plausible replacement tokens used to corrupt the input sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 50,
+      "query": "In the field of natural language processing, what does the acronym LSTM stand for?",
+      "binary_rels": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 51,
+      "query": "In the field of natural language processing, what is the name of the class of positional encoding methods that represent the distance between two tokens rather than their absolute indices, allowing attention weights to directly reflect how far apart any two tokens are?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 52,
+      "query": "In the field of natural language processing, what is the name of the positional encoding method used in models such as LLaMA and PaLM that encodes position by rotating the query and key vectors in the attention computation by an angle proportional to each token's absolute position index?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 53,
+      "query": "In the field of natural language processing, what is the name of the task in which a model must automatically produce a shorter version of an input document that retains its most important information?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 54,
+      "query": "In the field of natural language processing, what does the acronym GLUE stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 55,
+      "query": "In the field of natural language processing, what is the name of the Transformer mechanism in which each token computes attention weights over all tokens in the same sequence, allowing it to build a contextualised representation from the entire input?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 56,
+      "query": "In the field of natural language processing, what is the name of the masking scheme used in autoregressive Transformer decoders to prevent each position from attending to future tokens during training and generation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 57,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention operation in which query-key dot products are divided by the square root of the key dimension before the softmax is applied?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 58,
+      "query": "In the field of natural language processing, what is the name of the architectural connection pattern used throughout Transformer blocks where the input to a sub-layer is added back to that sub-layer's output before normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 59,
+      "query": "In the field of natural language processing, what is the name of the Word2Vec training objective in which the model predicts a target word from its surrounding context words?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 60,
+      "query": "In the field of natural language processing, what is the name of the type of word representation produced by models such as ELMo and BERT, where the embedding for a word changes depending on the sentence in which it appears?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 61,
+      "query": "In the field of natural language processing, what is the name of the question answering evaluation metric used on benchmarks such as SQuAD that computes the harmonic mean of token-level precision and recall between the predicted answer span and the gold answer span?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 62,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant that measures overlap based only on matching unigrams between a system summary and a reference summary?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 63,
+      "query": "In the field of natural language processing, what is the name of the special BERT token whose final hidden state is typically used for sentence-level classification tasks?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 64,
+      "query": "In the field of natural language processing, what is the name of the special BERT token used to separate two text segments in a paired input sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 65,
+      "query": "In the field of natural language processing, what is the name of the neural architecture family that maps an input text sequence to an output text sequence by first encoding the source and then decoding a target sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 66,
+      "query": "In the field of natural language processing, what is the name of the classic term-weighting scheme that multiplies term frequency by inverse document frequency to represent the importance of words in a document collection?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 67,
+      "query": "In the field of natural language processing, what is the name of the sparse retrieval ranking function widely used in information retrieval and question answering systems that extends term-frequency and inverse-document-frequency scoring with document-length normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 68,
+      "query": "In the field of natural language processing, what is the name of the retrieval architecture used by models such as DPR in which the query and each candidate passage are encoded independently into dense vectors and then compared in embedding space?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 69,
+      "query": "In the field of natural language processing, what is the name of the task in which a model learns to assign probabilities to token sequences and predict likely next words or next tokens in text?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 70,
+      "query": "In the field of natural language processing, what is the name of the task of automatically translating text from one natural language into another?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 71,
+      "query": "In the field of natural language processing, what is the name of the attention mechanism commonly associated with Luong et al., where attention scores are computed with multiplicative or dot-product interactions rather than an additive alignment network?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 72,
+      "query": "In the field of natural language processing, what is the general name for the tokenization strategy that breaks rare or unknown words into smaller meaningful units such as prefixes, suffixes, or frequent character sequences?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 73,
+      "query": "In the field of natural language processing, what is the name of the simple text representation in which a document is encoded as counts or binary indicators of vocabulary items while ignoring word order?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 74,
+      "query": "In the field of natural language processing, what is the name of the text normalisation process that reduces inflected or derived words to a common stem, often by heuristically stripping suffixes?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 75,
+      "query": "In the field of natural language processing, what is the name of the text normalisation process that maps inflected word forms to their dictionary base form, such as mapping 'running' to 'run'?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 76,
+      "query": "In the field of natural language processing, what is the name of the preprocessing step that removes very common function words such as 'the', 'is', and 'and' before text vectorisation or retrieval?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 77,
+      "query": "In the field of natural language processing, what is the name of the probabilistic topic model commonly abbreviated as LDA that represents each document as a mixture over latent topics and each topic as a distribution over words?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 78,
+      "query": "In the field of natural language processing, what is the name of the question answering setting in which the model must answer by selecting a contiguous span directly from the given passage rather than generating a free-form response?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 79,
+      "query": "In the field of natural language processing, what is the name of the summarization approach in which a system constructs a summary by selecting and concatenating sentences or spans directly from the source document?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 80,
+      "query": "In the field of natural language processing, what is the name of the summarization approach in which a system generates novel phrasing to produce a shorter summary instead of only copying spans from the source document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 81,
+      "query": "In the field of natural language processing, what is the name of the task that predicts whether a piece of text expresses a positive, negative, or neutral opinion?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 82,
+      "query": "In the field of natural language processing, what is the name of the syntactic parsing task that builds a phrase-structure tree with nested constituents such as noun phrases and verb phrases?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 83,
+      "query": "In the field of natural language processing, what is the name of the task of determining which sense of a polysemous word is intended in a given sentence context?",
+      "binary_rels": [
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "row_idx": 84,
+      "query": "In the field of natural language processing, what is the name of the task, often abbreviated STS, that asks a model to score how semantically similar two sentences are?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 85,
+      "query": "In the field of natural language processing, what is the name of the special token used in autoregressive language models to mark the end of a generated sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 86,
+      "query": "In the field of natural language processing, what is the name of the model introduced by Devlin et al. in 2018 that is pretrained with masked language modelling and next sentence prediction?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 87,
+      "query": "In the field of natural language processing, what is the name of the BERT-based model that removed next sentence prediction and trained on more data with larger batches, introduced by Facebook AI in 2019?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 88,
+      "query": "In the field of natural language processing, what is the name of the text-to-text Transformer model introduced by Raffel et al.?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 89,
+      "query": "In the field of natural language processing, what is the name of the denoising sequence-to-sequence model introduced by Lewis et al. in 2019?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 90,
+      "query": "In the field of natural language processing, what is the name of the contextual word representation model introduced by Peters et al. that uses deep bidirectional LSTMs trained as language models?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 91,
+      "query": "In the field of natural language processing, what is the name of the BERT variant that reduces parameters through cross-layer parameter sharing?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 92,
+      "query": "In the field of natural language processing, what is the name of the word embedding model that popularised the skip-gram and continuous bag-of-words objectives?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 93,
+      "query": "In the field of natural language processing, what is the name of the word embedding method based on global word co-occurrence statistics introduced by Pennington et al.?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 94,
+      "query": "In the field of natural language processing, what is the name of the summarization-oriented pretraining model that masks important sentences and trains the model to generate those missing sentences?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 95,
+      "query": "In the field of natural language processing, what is the name of the automatic evaluation metric based on n-gram overlap that is most commonly used for machine translation?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 96,
+      "query": "In the field of natural language processing, what is the name of the family of overlap-based evaluation metrics most commonly used for summarization?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 97,
+      "query": "In the field of natural language processing, what is the name of the reading-comprehension metric that gives credit only when the predicted answer exactly matches the reference answer after normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 98,
+      "query": "In the field of natural language processing, what is the name of the question answering metric that computes the harmonic mean of token-level precision and recall between a predicted answer and a gold answer?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 99,
+      "query": "In the field of natural language processing, what is the name of BERT's main pretraining objective in which some input tokens are replaced by a special mask token and the model predicts the originals?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 100,
+      "query": "In the field of natural language processing, what is the name of BERT's auxiliary pretraining task in which the model predicts whether one text segment follows another in the original document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 101,
+      "query": "In the field of natural language processing, what is the name of the GPT-style pretraining objective that predicts the next token from only the tokens to its left?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 102,
+      "query": "In the field of natural language processing, what is the name of the T5 pretraining objective in which contiguous spans are replaced by sentinel tokens and the model must reconstruct them?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 103,
+      "query": "In the field of natural language processing, what is the name of XLNet's training objective that considers multiple possible factorisation orders of the same sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 104,
+      "query": "In the field of natural language processing, what is the name of the mechanism that allows each token in a Transformer layer to attend to other tokens in the same sequence?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 105,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention variant in which several attention heads operate in parallel and their outputs are concatenated?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 106,
+      "query": "In the field of natural language processing, what is the name of the signal added to token embeddings in the original Transformer to represent token order?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 107,
+      "query": "In the field of natural language processing, what is the name of the normalisation method used inside Transformer blocks that normalises activations across the hidden dimension for each token?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 108,
+      "query": "In the field of natural language processing, what is the name of the connection pattern used in Transformers where a sub-layer's input is added back to its output?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 109,
+      "query": "In the field of natural language processing, what is the name of the decoding algorithm that keeps the top few partial hypotheses at each generation step instead of only one?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 110,
+      "query": "In the field of natural language processing, what is the name of the deterministic decoding strategy that always selects the highest-probability next token?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 111,
+      "query": "In the field of natural language processing, what is the name of the generation hyperparameter that divides logits before the softmax to make the output distribution sharper or flatter?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 112,
+      "query": "In the field of natural language processing, what is the name of the training technique in sequence-to-sequence models where the gold previous token is fed to the decoder during training?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 113,
+      "query": "In the field of natural language processing, what is the name of the subword tokenization algorithm used by the original BERT model?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 114,
+      "query": "In the field of natural language processing, what is the general name for tokenization methods such as BPE, WordPiece, and SentencePiece?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 115,
+      "query": "In the field of natural language processing, what is the name of the simple text representation that ignores word order and represents a document using vocabulary counts or indicators?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 116,
+      "query": "In the field of natural language processing, what is the name of the weighting scheme that multiplies term frequency by inverse document frequency?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 117,
+      "query": "In the field of natural language processing, what is the name of the classic retrieval scoring function that extends TF-IDF with document-length normalisation and is widely used in search and open-domain QA?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 118,
+      "query": "In the field of natural language processing, what is the name of the task of assigning labels such as positive, negative, or neutral to a piece of text?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 119,
+      "query": "In the field of natural language processing, what is the name of the task of identifying mentions of people, organisations, and locations in text?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 120,
+      "query": "In the field of natural language processing, what is the name of the task of assigning grammatical labels such as noun, verb, and adjective to words in a sentence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 121,
+      "query": "In the field of natural language processing, what is the name of the task in which a model is given a premise and a hypothesis and must decide entailment, contradiction, or neutral?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 122,
+      "query": "In the field of natural language processing, what is the name of the task of answering questions based on a passage or knowledge source?",
+      "binary_rels": [
+        1,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 123,
+      "query": "In the field of natural language processing, what is the name of the task of producing a shorter text that preserves the key information from a longer document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 124,
+      "query": "In the field of natural language processing, what is the name of the summarization setting in which the model can generate wording not present verbatim in the source document?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 125,
+      "query": "In the field of natural language processing, what is the name of the summarization setting in which the system builds a summary by selecting sentences or spans directly from the source?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 126,
+      "query": "In the field of natural language processing, what is the name of the Stanford reading-comprehension benchmark in which answers are extracted from Wikipedia passages?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 127,
+      "query": "In the field of natural language processing, what is the name of the benchmark introduced to evaluate models across multiple natural language understanding tasks such as entailment, sentiment, and similarity?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 128,
+      "query": "In the field of natural language processing, what is the name of the benchmark introduced as a harder successor to GLUE?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 129,
+      "query": "In the field of natural language processing, what is the name of the machine translation metric that, unlike BLEU, also considers stem matches and synonym matches?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 130,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric that compares candidate and reference texts using contextual embeddings from BERT?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 131,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant based on unigram overlap?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 132,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant based on longest common subsequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 133,
+      "query": "In the field of natural language processing, what is the name of the answer representation used in extractive question answering when the model predicts start and end positions in the context?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 134,
+      "query": "In the field of natural language processing, what is the name of the special BERT token whose final hidden state is commonly used for sequence-level classification?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 135,
+      "query": "In the field of natural language processing, what is the name of the special BERT token used to separate two text segments in the input?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 136,
+      "query": "In the field of natural language processing, what type of Transformer architecture do T5 and BART use?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 137,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning method that adds trainable low-rank matrices to frozen model weights?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 138,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning approach that inserts small trainable modules between the layers of a frozen Transformer?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 139,
+      "query": "In the field of natural language processing, what is the name of the standard two-stage paradigm in which a model is first trained on large unlabelled text and then adapted to a labelled downstream task?",
+      "binary_rels": [
+        1,
+        1,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 140,
+      "query": "In the field of natural language processing, what is the name of the left-to-right training objective used by GPT-style models to predict each next token?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 141,
+      "query": "In the field of natural language processing, what is the name of the bidirectional pretraining objective used by BERT to predict masked tokens from both left and right context?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 142,
+      "query": "In the field of natural language processing, what is the name of the kind of word representations produced by models such as BERT and ELMo in which the same word can have different vectors in different sentences?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 143,
+      "query": "In the field of natural language processing, what is the name of the retrieval setting in which queries and passages are represented as dense vectors rather than sparse term-count vectors?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 144,
+      "query": "In the field of natural language processing, what is the common abbreviation for encoder-decoder models that map an input text sequence to an output text sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 145,
+      "query": "In the field of natural language processing, what is the name of the token used to mark the end of a generated sequence in a language model?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 146,
+      "query": "In the field of natural language processing, which model family is best known for bidirectional masked-token pretraining and later fine-tuning on tasks such as classification and question answering?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 147,
+      "query": "In the field of natural language processing, which automatic metric is most commonly reported for machine translation systems based on n-gram overlap with reference translations?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 148,
+      "query": "In the field of natural language processing, which automatic metric family is most commonly reported for summarization systems based on overlap with reference summaries?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 149,
+      "query": "In the field of natural language processing, which original BERT pretraining objective was removed by RoBERTa?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 150,
+      "query": "In the field of natural language processing, what pretraining task did ALBERT use instead of next sentence prediction to model sentence-level coherence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 151,
+      "query": "In the field of natural language processing, what type of Transformer architecture processes the whole input bidirectionally and is typical of models such as BERT?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 152,
+      "query": "In the field of natural language processing, what type of Transformer architecture uses both an encoder and a decoder and is typical of T5 and BART?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 153,
+      "query": "In the field of natural language processing, what is the name of the mechanism that allows every token representation in BERT to incorporate information from other tokens in the same sentence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 154,
+      "query": "In the field of natural language processing, what is the name of the tokenization approach used to avoid unknown-word problems by splitting rare words into smaller pieces?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 155,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric that compares machine-generated translations with reference translations using n-gram precision?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 156,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric family that compares system-generated summaries with reference summaries using overlap-based measures?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 157,
+      "query": "In the field of natural language processing, what is the name of the benchmark task in which models classify premise-hypothesis pairs as entailment, contradiction, or neutral?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 158,
+      "query": "In the field of natural language processing, what is the name of the approximation technique commonly used with Word2Vec in which the model learns to distinguish observed word-context pairs from randomly sampled noise pairs?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 159,
+      "query": "In the field of natural language processing, what is the name of the large-vocabulary output-layer approximation used in neural language models and early word embedding systems where the vocabulary is arranged as a binary tree?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 160,
+      "query": "In the field of natural language processing, what is the name of the subword segmentation algorithm popularised in neural machine translation that iteratively merges the most frequent symbol pairs?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 161,
+      "query": "In the field of natural language processing, what is the name of the tokenization framework introduced by Kudo and Richardson that trains directly from raw text and is widely used for subword segmentation in neural NLP?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 162,
+      "query": "In the field of natural language processing, what probabilistic subword segmentation algorithm is commonly used by SentencePiece as an alternative to byte-pair encoding?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 163,
+      "query": "In the field of natural language processing, what is the name of the mechanism in sequence-to-sequence models that allows the decoder to directly reproduce tokens from the source text instead of generating them from the fixed vocabulary?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 164,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention sub-layer in encoder-decoder models where decoder states attend over the encoder's output representations?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 165,
+      "query": "In the field of natural language processing, what is the name of the embeddings BERT adds to indicate whether each token belongs to sentence A or sentence B in paired-sentence inputs?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 166,
+      "query": "In the field of natural language processing, what is the name of the special token commonly used to pad variable-length token sequences to a common length within a batch?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 167,
+      "query": "In the field of natural language processing, what is the name of the special token commonly used to mark the start of a target sequence in encoder-decoder generation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 168,
+      "query": "In the field of natural language processing, what is the name of the mask used in attention-based models to prevent computation over padding positions in a batched sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 169,
+      "query": "In the field of natural language processing, what type of subword units does fastText represent words with in order to handle rare and out-of-vocabulary forms?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 170,
+      "query": "In the field of natural language processing, what does the acronym ULMFiT stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 171,
+      "query": "In the field of natural language processing, what is the name of the tag encoding scheme for sequence labelling that uses labels beginning with B-, I-, and O to denote span boundaries and outside tokens?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 172,
+      "query": "In the field of natural language processing, what is the dependency parsing evaluation metric that counts a token as correct when its predicted head is correct regardless of the dependency label?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 173,
+      "query": "In the field of natural language processing, what is the dependency parsing evaluation metric that requires both the predicted head and the dependency relation label to be correct?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 174,
+      "query": "In the field of natural language processing, what is the ROUGE variant based on bigram overlap between a system summary and a reference summary?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 175,
+      "query": "In the field of natural language processing, what is the learned text generation evaluation metric introduced by Sellam et al. that fine-tunes BERT to score candidate outputs against references?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 176,
+      "query": "In the field of natural language processing, what is the stochastic decoding strategy that samples from the smallest set of next tokens whose cumulative probability exceeds a threshold p?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 177,
+      "query": "In the field of natural language processing, what is the name of the classic suffix-stripping stemming algorithm introduced by Martin Porter?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 178,
+      "query": "In the field of natural language processing, what is the masking strategy used by RoBERTa in which the masked positions are re-sampled across epochs instead of being fixed once in the training data?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 179,
+      "query": "In the field of natural language processing, what is the name of the special attention pattern in Longformer where selected tokens are allowed to attend globally across the entire sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "BM25": [
+    {
+      "row_idx": 0,
+      "query": "In the field of natural language processing, what is the name of the technique where a large trained model is used to supervise the training of a smaller model by having the smaller model match the output probability distributions of the larger one?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 1,
+      "query": "In the field of natural language processing, what architecture did Vaswani et al. introduce in their 2017 paper 'Attention Is All You Need'?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 2,
+      "query": "In the field of natural language processing, what is the name of the automatic evaluation metric most commonly used to assess the quality of machine translation outputs, based on n-gram precision overlap between system output and reference translations?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 3,
+      "query": "In the field of natural language processing, what does the BLEU score measure between a machine-generated translation and a human reference translation?",
+      "binary_rels": [
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 4,
+      "query": "In the field of natural language processing, what is the name of the sequence decoding strategy that maintains a fixed-size set of the most probable partial sequences at each generation step, expanding each candidate by one token and pruning back to the top candidates by cumulative log-probability?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 5,
+      "query": "In the field of natural language processing, what type of Transformer architecture does BERT use?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 6,
+      "query": "In the field of natural language processing, what is the name of BERT's primary pretraining objective, in which a random subset of input tokens is replaced with a special mask token and the model must predict the original vocabulary item at each masked position?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 7,
+      "query": "In the field of natural language processing, what is the name of the family of automatic evaluation metrics most commonly used to assess the quality of text summarization systems, based on n-gram and longest-common-subsequence overlap between system output and reference summaries?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 8,
+      "query": "In the field of natural language processing, what does the abbreviation ROUGE stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 9,
+      "query": "In the field of natural language processing, what type of Transformer architecture does the T5 model use?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 10,
+      "query": "In the field of natural language processing, what is the pretraining objective used by T5, in which contiguous spans of tokens in the input are replaced with unique sentinel tokens and the model must output the missing spans?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 11,
+      "query": "In the field of natural language processing, what does the abbreviation ELMo stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 12,
+      "query": "In the field of natural language processing, what is the pretraining objective used by XLNet, in which the model is trained to predict tokens autoregressively over all possible factorisation orders of the input sequence rather than strictly left-to-right?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 13,
+      "query": "In the field of natural language processing, what pretraining task does ALBERT use in place of BERT's next sentence prediction objective, where the model must determine whether two consecutive segments have been swapped in order?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 14,
+      "query": "In the field of natural language processing, what is the name of the machine translation evaluation metric that, unlike BLEU, accounts for stem matches and synonym matches via WordNet when comparing system output to reference translations?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 15,
+      "query": "In the field of natural language processing, what is the name of the language model evaluation metric defined as the exponentiated average negative log-likelihood per token, which measures how well a model assigns probability to a held-out text corpus?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 16,
+      "query": "In the field of natural language processing, what is the name of the small trainable feed-forward modules inserted between the frozen layers of a pre-trained Transformer during parameter-efficient task adaptation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 17,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning technique introduced by Hu et al. that injects trainable rank-decomposition matrices into the frozen weight matrices of a pre-trained language model instead of updating all parameters?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 18,
+      "query": "In the field of natural language processing, what does the acronym GPT stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 19,
+      "query": "In the field of natural language processing, which of BERT's original pretraining objectives did RoBERTa remove during its replication and improvement study, finding that it hurt rather than helped downstream performance?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 20,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention variant where the full attention computation is split across several independent heads each with its own learned projection matrices, and their outputs are concatenated before a final linear projection?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 21,
+      "query": "In the field of natural language processing, what is the name of the signal added to token embeddings in the original Transformer to convey each token's position in the sequence, compensating for the fact that self-attention is permutation-invariant?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 22,
+      "query": "In the field of natural language processing, what is the name of the word embedding model introduced by Mikolov et al. in 2013 that learns dense vector representations of words using a shallow neural network trained on either a skip-gram or continuous bag-of-words objective?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 23,
+      "query": "In the field of natural language processing, what is the name of the word embedding model by Pennington et al. that learns vector representations by factorising a matrix of global word co-occurrence counts collected from a large corpus?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 24,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric used in reading comprehension benchmarks such as SQuAD that assigns a score of 1 only when the model's predicted answer string matches the gold answer character-for-character after normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 25,
+      "query": "In the field of natural language processing, what does the acronym BERT stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 26,
+      "query": "In the field of natural language processing, what does the acronym T5 stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 27,
+      "query": "In the field of natural language processing, what is the name of the secondary pretraining objective in the original BERT paper, where the model is given two text segments and must predict whether the second segment genuinely follows the first in the original document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 28,
+      "query": "In the field of natural language processing, what is the name of the sequence-to-sequence training technique where, at each decoding step, the model receives the ground-truth token from the previous position as input rather than its own previously generated output?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 29,
+      "query": "In the field of natural language processing, what is the name of the attention mechanism introduced by Bahdanau et al. in 2015, in which the decoder at each step computes a context vector as a weighted sum of all encoder hidden states with weights determined by a learned alignment model?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 30,
+      "query": "In the field of natural language processing, what is the name of the normalisation technique applied inside each Transformer sub-layer that standardises activations across the hidden-state dimension independently for each token position?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 31,
+      "query": "In the field of natural language processing, what is the name of the two-stage training paradigm in which a neural network is first trained on a large unlabelled corpus using a self-supervised objective and then adapted to a downstream task using a smaller labelled dataset?",
+      "binary_rels": [
+        1,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 32,
+      "query": "In the field of natural language processing, what is the name of the Transformer-based model by Beltagy et al. that replaces standard full self-attention with a combination of local sliding window attention and sparse global attention to scale to document-length inputs?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 33,
+      "query": "In the field of natural language processing, what is the name of the word embedding model by Bojanowski et al. that represents each word as the sum of its constituent character n-gram vectors, enabling the construction of embeddings for out-of-vocabulary words?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 34,
+      "query": "In the field of natural language processing, what is the name of the scalar hyperparameter used during text generation that divides the model's logits before the softmax, where lower values sharpen the output distribution and higher values flatten it?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 35,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning method introduced by Li and Liang in which a sequence of trainable continuous token embeddings is prepended to the input at every Transformer layer while the original model weights remain frozen?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 36,
+      "query": "In the field of natural language processing, what is the name of the probabilistic graphical model layer commonly placed on top of a recurrent or Transformer encoder in sequence labeling systems that captures dependencies between adjacent output labels rather than treating each prediction independently?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 37,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant that measures similarity using the longest common subsequence between the hypothesis and the reference rather than fixed-length n-gram overlap?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 38,
+      "query": "In the field of natural language processing, what does the acronym NER stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 39,
+      "query": "In the field of natural language processing, what does the acronym POS stand for when referring to the task of assigning a grammatical category label to each word in a sentence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 40,
+      "query": "In the field of natural language processing, what is the name of the task in which a system must identify all mentions of the same real-world entity across a document and group them into clusters?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 41,
+      "query": "In the field of natural language processing, what is the name of the syntactic analysis task in which a model must parse a sentence into a tree of directed labelled arcs representing grammatical relations between word pairs, such as subject, object, and modifier?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 42,
+      "query": "In the field of natural language processing, what is the name of the self-supervised representation learning objective used in SimCSE and other sentence embedding models, where positive pairs of semantically similar sentences are pulled together and negative pairs are pushed apart in the embedding space?",
+      "binary_rels": [
+        0,
+        1,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "row_idx": 43,
+      "query": "In the field of natural language processing, what is the name of the deterministic text generation strategy that at each step selects the single token with the highest probability according to the model's output distribution?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 44,
+      "query": "In the field of natural language processing, what does the acronym SQuAD stand for?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 45,
+      "query": "In the field of natural language processing, what does the acronym RAG stand for when referring to the technique of augmenting a language model's input with documents retrieved from an external corpus at inference time?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 46,
+      "query": "In the field of natural language processing, what is the name of the BERT variant by Joshi et al. that masks contiguous random spans of tokens rather than individual tokens and adds a span boundary objective that requires predicting masked span content using only the representations of the boundary tokens?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 47,
+      "query": "In the field of natural language processing, what is the name of the multi-task natural language understanding benchmark introduced in 2018 that evaluates models across nine diverse tasks including sentiment analysis, textual entailment, and question answering?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 48,
+      "query": "In the field of natural language processing, what is the name of the harder successor benchmark to GLUE, introduced in 2019 after state-of-the-art models surpassed human performance on GLUE, that includes tasks requiring multi-sentence reasoning and common-sense understanding?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 49,
+      "query": "In the field of natural language processing, what is the name given to the smaller model within the ELECTRA pretraining framework that is trained with a masked language modelling objective and produces plausible replacement tokens used to corrupt the input sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 50,
+      "query": "In the field of natural language processing, what does the acronym LSTM stand for?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 51,
+      "query": "In the field of natural language processing, what is the name of the class of positional encoding methods that represent the distance between two tokens rather than their absolute indices, allowing attention weights to directly reflect how far apart any two tokens are?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 52,
+      "query": "In the field of natural language processing, what is the name of the positional encoding method used in models such as LLaMA and PaLM that encodes position by rotating the query and key vectors in the attention computation by an angle proportional to each token's absolute position index?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 53,
+      "query": "In the field of natural language processing, what is the name of the task in which a model must automatically produce a shorter version of an input document that retains its most important information?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 54,
+      "query": "In the field of natural language processing, what does the acronym GLUE stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 55,
+      "query": "In the field of natural language processing, what is the name of the Transformer mechanism in which each token computes attention weights over all tokens in the same sequence, allowing it to build a contextualised representation from the entire input?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 56,
+      "query": "In the field of natural language processing, what is the name of the masking scheme used in autoregressive Transformer decoders to prevent each position from attending to future tokens during training and generation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 57,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention operation in which query-key dot products are divided by the square root of the key dimension before the softmax is applied?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 58,
+      "query": "In the field of natural language processing, what is the name of the architectural connection pattern used throughout Transformer blocks where the input to a sub-layer is added back to that sub-layer's output before normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 59,
+      "query": "In the field of natural language processing, what is the name of the Word2Vec training objective in which the model predicts a target word from its surrounding context words?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 60,
+      "query": "In the field of natural language processing, what is the name of the type of word representation produced by models such as ELMo and BERT, where the embedding for a word changes depending on the sentence in which it appears?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 61,
+      "query": "In the field of natural language processing, what is the name of the question answering evaluation metric used on benchmarks such as SQuAD that computes the harmonic mean of token-level precision and recall between the predicted answer span and the gold answer span?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 62,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant that measures overlap based only on matching unigrams between a system summary and a reference summary?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 63,
+      "query": "In the field of natural language processing, what is the name of the special BERT token whose final hidden state is typically used for sentence-level classification tasks?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 64,
+      "query": "In the field of natural language processing, what is the name of the special BERT token used to separate two text segments in a paired input sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 65,
+      "query": "In the field of natural language processing, what is the name of the neural architecture family that maps an input text sequence to an output text sequence by first encoding the source and then decoding a target sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 66,
+      "query": "In the field of natural language processing, what is the name of the classic term-weighting scheme that multiplies term frequency by inverse document frequency to represent the importance of words in a document collection?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 67,
+      "query": "In the field of natural language processing, what is the name of the sparse retrieval ranking function widely used in information retrieval and question answering systems that extends term-frequency and inverse-document-frequency scoring with document-length normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 68,
+      "query": "In the field of natural language processing, what is the name of the retrieval architecture used by models such as DPR in which the query and each candidate passage are encoded independently into dense vectors and then compared in embedding space?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 69,
+      "query": "In the field of natural language processing, what is the name of the task in which a model learns to assign probabilities to token sequences and predict likely next words or next tokens in text?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 70,
+      "query": "In the field of natural language processing, what is the name of the task of automatically translating text from one natural language into another?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 71,
+      "query": "In the field of natural language processing, what is the name of the attention mechanism commonly associated with Luong et al., where attention scores are computed with multiplicative or dot-product interactions rather than an additive alignment network?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 72,
+      "query": "In the field of natural language processing, what is the general name for the tokenization strategy that breaks rare or unknown words into smaller meaningful units such as prefixes, suffixes, or frequent character sequences?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        1
+      ]
+    },
+    {
+      "row_idx": 73,
+      "query": "In the field of natural language processing, what is the name of the simple text representation in which a document is encoded as counts or binary indicators of vocabulary items while ignoring word order?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 74,
+      "query": "In the field of natural language processing, what is the name of the text normalisation process that reduces inflected or derived words to a common stem, often by heuristically stripping suffixes?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 75,
+      "query": "In the field of natural language processing, what is the name of the text normalisation process that maps inflected word forms to their dictionary base form, such as mapping 'running' to 'run'?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 76,
+      "query": "In the field of natural language processing, what is the name of the preprocessing step that removes very common function words such as 'the', 'is', and 'and' before text vectorisation or retrieval?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 77,
+      "query": "In the field of natural language processing, what is the name of the probabilistic topic model commonly abbreviated as LDA that represents each document as a mixture over latent topics and each topic as a distribution over words?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 78,
+      "query": "In the field of natural language processing, what is the name of the question answering setting in which the model must answer by selecting a contiguous span directly from the given passage rather than generating a free-form response?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 79,
+      "query": "In the field of natural language processing, what is the name of the summarization approach in which a system constructs a summary by selecting and concatenating sentences or spans directly from the source document?",
+      "binary_rels": [
+        0,
+        1,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 80,
+      "query": "In the field of natural language processing, what is the name of the summarization approach in which a system generates novel phrasing to produce a shorter summary instead of only copying spans from the source document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 81,
+      "query": "In the field of natural language processing, what is the name of the task that predicts whether a piece of text expresses a positive, negative, or neutral opinion?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 82,
+      "query": "In the field of natural language processing, what is the name of the syntactic parsing task that builds a phrase-structure tree with nested constituents such as noun phrases and verb phrases?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 83,
+      "query": "In the field of natural language processing, what is the name of the task of determining which sense of a polysemous word is intended in a given sentence context?",
+      "binary_rels": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 84,
+      "query": "In the field of natural language processing, what is the name of the task, often abbreviated STS, that asks a model to score how semantically similar two sentences are?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 85,
+      "query": "In the field of natural language processing, what is the name of the special token used in autoregressive language models to mark the end of a generated sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 86,
+      "query": "In the field of natural language processing, what is the name of the model introduced by Devlin et al. in 2018 that is pretrained with masked language modelling and next sentence prediction?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 87,
+      "query": "In the field of natural language processing, what is the name of the BERT-based model that removed next sentence prediction and trained on more data with larger batches, introduced by Facebook AI in 2019?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 88,
+      "query": "In the field of natural language processing, what is the name of the text-to-text Transformer model introduced by Raffel et al.?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 89,
+      "query": "In the field of natural language processing, what is the name of the denoising sequence-to-sequence model introduced by Lewis et al. in 2019?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 90,
+      "query": "In the field of natural language processing, what is the name of the contextual word representation model introduced by Peters et al. that uses deep bidirectional LSTMs trained as language models?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 91,
+      "query": "In the field of natural language processing, what is the name of the BERT variant that reduces parameters through cross-layer parameter sharing?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 92,
+      "query": "In the field of natural language processing, what is the name of the word embedding model that popularised the skip-gram and continuous bag-of-words objectives?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 93,
+      "query": "In the field of natural language processing, what is the name of the word embedding method based on global word co-occurrence statistics introduced by Pennington et al.?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 94,
+      "query": "In the field of natural language processing, what is the name of the summarization-oriented pretraining model that masks important sentences and trains the model to generate those missing sentences?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 95,
+      "query": "In the field of natural language processing, what is the name of the automatic evaluation metric based on n-gram overlap that is most commonly used for machine translation?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 96,
+      "query": "In the field of natural language processing, what is the name of the family of overlap-based evaluation metrics most commonly used for summarization?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 97,
+      "query": "In the field of natural language processing, what is the name of the reading-comprehension metric that gives credit only when the predicted answer exactly matches the reference answer after normalisation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 98,
+      "query": "In the field of natural language processing, what is the name of the question answering metric that computes the harmonic mean of token-level precision and recall between a predicted answer and a gold answer?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 99,
+      "query": "In the field of natural language processing, what is the name of BERT's main pretraining objective in which some input tokens are replaced by a special mask token and the model predicts the originals?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 100,
+      "query": "In the field of natural language processing, what is the name of BERT's auxiliary pretraining task in which the model predicts whether one text segment follows another in the original document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 101,
+      "query": "In the field of natural language processing, what is the name of the GPT-style pretraining objective that predicts the next token from only the tokens to its left?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 102,
+      "query": "In the field of natural language processing, what is the name of the T5 pretraining objective in which contiguous spans are replaced by sentinel tokens and the model must reconstruct them?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 103,
+      "query": "In the field of natural language processing, what is the name of XLNet's training objective that considers multiple possible factorisation orders of the same sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 104,
+      "query": "In the field of natural language processing, what is the name of the mechanism that allows each token in a Transformer layer to attend to other tokens in the same sequence?",
+      "binary_rels": [
+        1,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 105,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention variant in which several attention heads operate in parallel and their outputs are concatenated?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 106,
+      "query": "In the field of natural language processing, what is the name of the signal added to token embeddings in the original Transformer to represent token order?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 107,
+      "query": "In the field of natural language processing, what is the name of the normalisation method used inside Transformer blocks that normalises activations across the hidden dimension for each token?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 108,
+      "query": "In the field of natural language processing, what is the name of the connection pattern used in Transformers where a sub-layer's input is added back to its output?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 109,
+      "query": "In the field of natural language processing, what is the name of the decoding algorithm that keeps the top few partial hypotheses at each generation step instead of only one?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 110,
+      "query": "In the field of natural language processing, what is the name of the deterministic decoding strategy that always selects the highest-probability next token?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 111,
+      "query": "In the field of natural language processing, what is the name of the generation hyperparameter that divides logits before the softmax to make the output distribution sharper or flatter?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 112,
+      "query": "In the field of natural language processing, what is the name of the training technique in sequence-to-sequence models where the gold previous token is fed to the decoder during training?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 113,
+      "query": "In the field of natural language processing, what is the name of the subword tokenization algorithm used by the original BERT model?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 114,
+      "query": "In the field of natural language processing, what is the general name for tokenization methods such as BPE, WordPiece, and SentencePiece?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 115,
+      "query": "In the field of natural language processing, what is the name of the simple text representation that ignores word order and represents a document using vocabulary counts or indicators?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 116,
+      "query": "In the field of natural language processing, what is the name of the weighting scheme that multiplies term frequency by inverse document frequency?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 117,
+      "query": "In the field of natural language processing, what is the name of the classic retrieval scoring function that extends TF-IDF with document-length normalisation and is widely used in search and open-domain QA?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 118,
+      "query": "In the field of natural language processing, what is the name of the task of assigning labels such as positive, negative, or neutral to a piece of text?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 119,
+      "query": "In the field of natural language processing, what is the name of the task of identifying mentions of people, organisations, and locations in text?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 120,
+      "query": "In the field of natural language processing, what is the name of the task of assigning grammatical labels such as noun, verb, and adjective to words in a sentence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 121,
+      "query": "In the field of natural language processing, what is the name of the task in which a model is given a premise and a hypothesis and must decide entailment, contradiction, or neutral?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 122,
+      "query": "In the field of natural language processing, what is the name of the task of answering questions based on a passage or knowledge source?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        1,
+        1
+      ]
+    },
+    {
+      "row_idx": 123,
+      "query": "In the field of natural language processing, what is the name of the task of producing a shorter text that preserves the key information from a longer document?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 124,
+      "query": "In the field of natural language processing, what is the name of the summarization setting in which the model can generate wording not present verbatim in the source document?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 125,
+      "query": "In the field of natural language processing, what is the name of the summarization setting in which the system builds a summary by selecting sentences or spans directly from the source?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 126,
+      "query": "In the field of natural language processing, what is the name of the Stanford reading-comprehension benchmark in which answers are extracted from Wikipedia passages?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 127,
+      "query": "In the field of natural language processing, what is the name of the benchmark introduced to evaluate models across multiple natural language understanding tasks such as entailment, sentiment, and similarity?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 128,
+      "query": "In the field of natural language processing, what is the name of the benchmark introduced as a harder successor to GLUE?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 129,
+      "query": "In the field of natural language processing, what is the name of the machine translation metric that, unlike BLEU, also considers stem matches and synonym matches?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 130,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric that compares candidate and reference texts using contextual embeddings from BERT?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 131,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant based on unigram overlap?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 132,
+      "query": "In the field of natural language processing, what is the name of the ROUGE variant based on longest common subsequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 133,
+      "query": "In the field of natural language processing, what is the name of the answer representation used in extractive question answering when the model predicts start and end positions in the context?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 134,
+      "query": "In the field of natural language processing, what is the name of the special BERT token whose final hidden state is commonly used for sequence-level classification?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 135,
+      "query": "In the field of natural language processing, what is the name of the special BERT token used to separate two text segments in the input?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 136,
+      "query": "In the field of natural language processing, what type of Transformer architecture do T5 and BART use?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 137,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning method that adds trainable low-rank matrices to frozen model weights?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 138,
+      "query": "In the field of natural language processing, what is the name of the parameter-efficient fine-tuning approach that inserts small trainable modules between the layers of a frozen Transformer?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 139,
+      "query": "In the field of natural language processing, what is the name of the standard two-stage paradigm in which a model is first trained on large unlabelled text and then adapted to a labelled downstream task?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 140,
+      "query": "In the field of natural language processing, what is the name of the left-to-right training objective used by GPT-style models to predict each next token?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 141,
+      "query": "In the field of natural language processing, what is the name of the bidirectional pretraining objective used by BERT to predict masked tokens from both left and right context?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 142,
+      "query": "In the field of natural language processing, what is the name of the kind of word representations produced by models such as BERT and ELMo in which the same word can have different vectors in different sentences?",
+      "binary_rels": [
+        0,
+        0,
+        1,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 143,
+      "query": "In the field of natural language processing, what is the name of the retrieval setting in which queries and passages are represented as dense vectors rather than sparse term-count vectors?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 144,
+      "query": "In the field of natural language processing, what is the common abbreviation for encoder-decoder models that map an input text sequence to an output text sequence?",
+      "binary_rels": [
+        1,
+        1,
+        1,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 145,
+      "query": "In the field of natural language processing, what is the name of the token used to mark the end of a generated sequence in a language model?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 146,
+      "query": "In the field of natural language processing, which model family is best known for bidirectional masked-token pretraining and later fine-tuning on tasks such as classification and question answering?",
+      "binary_rels": [
+        1,
+        0,
+        1,
+        1,
+        1
+      ]
+    },
+    {
+      "row_idx": 147,
+      "query": "In the field of natural language processing, which automatic metric is most commonly reported for machine translation systems based on n-gram overlap with reference translations?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 148,
+      "query": "In the field of natural language processing, which automatic metric family is most commonly reported for summarization systems based on overlap with reference summaries?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 149,
+      "query": "In the field of natural language processing, which original BERT pretraining objective was removed by RoBERTa?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 150,
+      "query": "In the field of natural language processing, what pretraining task did ALBERT use instead of next sentence prediction to model sentence-level coherence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 151,
+      "query": "In the field of natural language processing, what type of Transformer architecture processes the whole input bidirectionally and is typical of models such as BERT?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 152,
+      "query": "In the field of natural language processing, what type of Transformer architecture uses both an encoder and a decoder and is typical of T5 and BART?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 153,
+      "query": "In the field of natural language processing, what is the name of the mechanism that allows every token representation in BERT to incorporate information from other tokens in the same sentence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 154,
+      "query": "In the field of natural language processing, what is the name of the tokenization approach used to avoid unknown-word problems by splitting rare words into smaller pieces?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 155,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric that compares machine-generated translations with reference translations using n-gram precision?",
+      "binary_rels": [
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 156,
+      "query": "In the field of natural language processing, what is the name of the evaluation metric family that compares system-generated summaries with reference summaries using overlap-based measures?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 157,
+      "query": "In the field of natural language processing, what is the name of the benchmark task in which models classify premise-hypothesis pairs as entailment, contradiction, or neutral?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 158,
+      "query": "In the field of natural language processing, what is the name of the approximation technique commonly used with Word2Vec in which the model learns to distinguish observed word-context pairs from randomly sampled noise pairs?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 159,
+      "query": "In the field of natural language processing, what is the name of the large-vocabulary output-layer approximation used in neural language models and early word embedding systems where the vocabulary is arranged as a binary tree?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 160,
+      "query": "In the field of natural language processing, what is the name of the subword segmentation algorithm popularised in neural machine translation that iteratively merges the most frequent symbol pairs?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 161,
+      "query": "In the field of natural language processing, what is the name of the tokenization framework introduced by Kudo and Richardson that trains directly from raw text and is widely used for subword segmentation in neural NLP?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 162,
+      "query": "In the field of natural language processing, what probabilistic subword segmentation algorithm is commonly used by SentencePiece as an alternative to byte-pair encoding?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 163,
+      "query": "In the field of natural language processing, what is the name of the mechanism in sequence-to-sequence models that allows the decoder to directly reproduce tokens from the source text instead of generating them from the fixed vocabulary?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 164,
+      "query": "In the field of natural language processing, what is the name of the Transformer attention sub-layer in encoder-decoder models where decoder states attend over the encoder's output representations?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 165,
+      "query": "In the field of natural language processing, what is the name of the embeddings BERT adds to indicate whether each token belongs to sentence A or sentence B in paired-sentence inputs?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 166,
+      "query": "In the field of natural language processing, what is the name of the special token commonly used to pad variable-length token sequences to a common length within a batch?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 167,
+      "query": "In the field of natural language processing, what is the name of the special token commonly used to mark the start of a target sequence in encoder-decoder generation?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 168,
+      "query": "In the field of natural language processing, what is the name of the mask used in attention-based models to prevent computation over padding positions in a batched sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 169,
+      "query": "In the field of natural language processing, what type of subword units does fastText represent words with in order to handle rare and out-of-vocabulary forms?",
+      "binary_rels": [
+        1,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 170,
+      "query": "In the field of natural language processing, what does the acronym ULMFiT stand for?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 171,
+      "query": "In the field of natural language processing, what is the name of the tag encoding scheme for sequence labelling that uses labels beginning with B-, I-, and O to denote span boundaries and outside tokens?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 172,
+      "query": "In the field of natural language processing, what is the dependency parsing evaluation metric that counts a token as correct when its predicted head is correct regardless of the dependency label?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 173,
+      "query": "In the field of natural language processing, what is the dependency parsing evaluation metric that requires both the predicted head and the dependency relation label to be correct?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 174,
+      "query": "In the field of natural language processing, what is the ROUGE variant based on bigram overlap between a system summary and a reference summary?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        1,
+        0
+      ]
+    },
+    {
+      "row_idx": 175,
+      "query": "In the field of natural language processing, what is the learned text generation evaluation metric introduced by Sellam et al. that fine-tunes BERT to score candidate outputs against references?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 176,
+      "query": "In the field of natural language processing, what is the stochastic decoding strategy that samples from the smallest set of next tokens whose cumulative probability exceeds a threshold p?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 177,
+      "query": "In the field of natural language processing, what is the name of the classic suffix-stripping stemming algorithm introduced by Martin Porter?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 178,
+      "query": "In the field of natural language processing, what is the masking strategy used by RoBERTa in which the masked positions are re-sampled across epochs instead of being fixed once in the training data?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "row_idx": 179,
+      "query": "In the field of natural language processing, what is the name of the special attention pattern in Longformer where selected tokens are allowed to attend globally across the entire sequence?",
+      "binary_rels": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

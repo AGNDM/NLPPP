@@ -1,0 +1,346 @@
+Building BM25 index...
+  → BM25 index ready
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUERY 1: How do convolutional neural networks extract events from text?
+════════════════════════════════════════════════════════════════════════════════
+
+  ── BM25 Result ──────────────────────────────────────────────
+  Title   : Jointly Multiple Events Extraction via Attention-based Graph Information Aggregation
+  Abstract:
+    Event extraction is of practical utility in natural language processing.
+    In the real world, it is a common phenomenon that multiple events existing
+    in the same sentence, where extracting them are more difficult than
+    extracting a single event. Previous works on modeling the associations
+    between events by sequential modeling methods suffer a lot from the low
+    efficiency in capturing very long-range dependencies. In this paper, we
+    propose a novel Jointly Multiple Events Extraction (JMEE) framework to
+    jointly extract multiple event triggers and arguments by introducing
+    syntactic shortcut arcs to enhance information flow and attention-based
+    graph convolution networks to model graph information. The experiment
+    results demonstrate that our proposed framework achieves competitive
+    results compared with state-of-the-art methods.
+
+  [ Annotator 1 relevance: ___0 ]   [ Annotator 2 relevance: ___0 ]
+
+  ── Embedding (SPECTER2) Result ──────────────────────────────
+  Title   : Event Extraction via Dynamic Multi-Pooling Convolutional Neural Networks
+  Score   : 0.8095
+  Abstract:
+    Traditional approaches to the task of ACE event extraction primarily rely
+    on elaborately designed features and complicated natural language
+    processing (NLP) tools. These traditional approaches lack generalization,
+    take a large amount of human effort and are prone to error propagation and
+    data sparsity problems. This paper proposes a novel event-extraction
+    method, which aims to automatically extract lexical-level and sentence-
+    level features without using complicated NLP tools. We introduce a word-
+    representation model to capture meaningful semantic regularities for words
+    and adopt a framework based on a convolutional neural network (CNN) to
+    capture sentence-level clues. However, CNN can only capture the most
+    important information in a sentence and may miss valuable facts when
+    considering multiple-event sentences. We propose a dynamic multi-pooling
+    convolutional neural network (DMCNN), which uses a dynamic multi-pooling
+    layer according to event triggers and arguments, to reserve more crucial
+    information. The experimental results show that our approach significantly
+    outperforms other state-of-the-art methods.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUERY 2: Can simple bag-of-words deep learning models compete with syntactic models for text classification?
+════════════════════════════════════════════════════════════════════════════════
+
+  ── BM25 Result ──────────────────────────────────────────────
+  Title   : Deep Unordered Composition Rivals Syntactic Methods for Text Classification
+  Abstract:
+    Many existing deep learning models for natural language processing tasks
+    focus on learning the compositionality of their inputs, which requires
+    many expensive computations. We present a simple deep neural network that
+    competes with and, in some cases, outperforms such models on sentiment
+    analysis and factoid question answering tasks while taking only a fraction
+    of the training time. While our model is syntactically-ignorant, we show
+    significant improvements over previous bag-of-words models by deepening
+    our network and applying a novel variant of dropout. Moreover, our model
+    performs better than syntactic models on datasets with high syntactic
+    variance. We show that our model makes similar errors to syntactically-
+    aware models, indicating that for the tasks we consider, nonlinearly
+    transforming the input is more important than tailoring a network to
+    incorporate word order and syntax.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+  ── Embedding (SPECTER2) Result ──────────────────────────────
+  Title   : Deep Unordered Composition Rivals Syntactic Methods for Text Classification
+  Score   : 0.7682
+  Abstract:
+    Many existing deep learning models for natural language processing tasks
+    focus on learning the compositionality of their inputs, which requires
+    many expensive computations. We present a simple deep neural network that
+    competes with and, in some cases, outperforms such models on sentiment
+    analysis and factoid question answering tasks while taking only a fraction
+    of the training time. While our model is syntactically-ignorant, we show
+    significant improvements over previous bag-of-words models by deepening
+    our network and applying a novel variant of dropout. Moreover, our model
+    performs better than syntactic models on datasets with high syntactic
+    variance. We show that our model makes similar errors to syntactically-
+    aware models, indicating that for the tasks we consider, nonlinearly
+    transforming the input is more important than tailoring a network to
+    incorporate word order and syntax.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUERY 3: How can recurrent neural networks be used for semantic role labeling without parsing?
+════════════════════════════════════════════════════════════════════════════════
+
+  ── BM25 Result ──────────────────────────────────────────────
+  Title   : End-to-end learning of semantic role labeling using recurrent neural networks
+  Abstract:
+    Semantic role labeling (SRL) is one of the basic natural language
+    processing (NLP) problems. To this date, most of the successful SRL
+    systems were built on top of some form of parsing results (Koomen et al.,
+    2005; Palmer et al., 2010; Pradhan et al., 2013), where pre-defined
+    feature templates over the syntactic structure are used. The attempts of
+    building an end-to-end SRL learning system without using parsing were less
+    successful (Collobert et al., 2011). In this work, we propose to use deep
+    bi-directional recurrent network as an end-to-end system for SRL. We take
+    only original text information as input feature, without using any
+    syntactic knowledge. The proposed algorithm for semantic role labeling was
+    mainly evaluated on CoNLL-2005 shared task and achieved F1 score of 81.07.
+    This result outperforms the previous state-of-the-art system from the
+    combination of different parsing trees or models. We also obtained the
+    same conclusion with F1 = 81.27 on CoNLL2012 shared task. As a result of
+    simplicity, our model is also computationally efficient that the parsing
+    speed is 6.7k tokens per second. Our analysis shows that our model is
+    better at handling longer sentences than traditional models. And the
+    latent variables of our model implicitly capture the syntactic structure
+    of a sentence.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+  ── Embedding (SPECTER2) Result ──────────────────────────────
+  Title   : End-to-end learning of semantic role labeling using recurrent neural networks
+  Score   : 0.7846
+  Abstract:
+    Semantic role labeling (SRL) is one of the basic natural language
+    processing (NLP) problems. To this date, most of the successful SRL
+    systems were built on top of some form of parsing results (Koomen et al.,
+    2005; Palmer et al., 2010; Pradhan et al., 2013), where pre-defined
+    feature templates over the syntactic structure are used. The attempts of
+    building an end-to-end SRL learning system without using parsing were less
+    successful (Collobert et al., 2011). In this work, we propose to use deep
+    bi-directional recurrent network as an end-to-end system for SRL. We take
+    only original text information as input feature, without using any
+    syntactic knowledge. The proposed algorithm for semantic role labeling was
+    mainly evaluated on CoNLL-2005 shared task and achieved F1 score of 81.07.
+    This result outperforms the previous state-of-the-art system from the
+    combination of different parsing trees or models. We also obtained the
+    same conclusion with F1 = 81.27 on CoNLL2012 shared task. As a result of
+    simplicity, our model is also computationally efficient that the parsing
+    speed is 6.7k tokens per second. Our analysis shows that our model is
+    better at handling longer sentences than traditional models. And the
+    latent variables of our model implicitly capture the syntactic structure
+    of a sentence.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUERY 4: Do multi-sense word embeddings improve performance on NLP tasks like POS tagging and sentiment analysis?
+════════════════════════════════════════════════════════════════════════════════
+
+  ── BM25 Result ──────────────────────────────────────────────
+  Title   : Do Multi-Sense Embeddings Improve Natural Language Understanding?
+  Abstract:
+    Learning a distinct representation for each sense of an ambiguous word
+    could lead to more powerful and fine-grained models of vector-space
+    representations. Yet while ‘multi-sense’ methods have been proposed and
+    tested on artificial wordsimilarity tasks, we don’t know if they improve
+    real natural language understanding tasks. In this paper we introduce a
+    multisense embedding model based on Chinese Restaurant Processes that
+    achieves state of the art performance on matching human word similarity
+    judgments, and propose a pipelined architecture for incorporating multi-
+    sense embeddings into language understanding. We then test the performance
+    of our model on part-of-speech tagging, named entity recognition,
+    sentiment analysis, semantic relation identification and semantic
+    relatedness, controlling for embedding dimensionality. We find that multi-
+    sense embeddings do improve performance on some tasks (part-of-speech
+    tagging, semantic relation identification, semantic relatedness) but not
+    on others (named entity recognition, various forms of sentiment analysis).
+    We discuss how these differences may be caused by the different role of
+    word sense information in each of the tasks. The results highlight the
+    importance of testing embedding models in real applications.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+  ── Embedding (SPECTER2) Result ──────────────────────────────
+  Title   : Do Multi-Sense Embeddings Improve Natural Language Understanding?
+  Score   : 0.7832
+  Abstract:
+    Learning a distinct representation for each sense of an ambiguous word
+    could lead to more powerful and fine-grained models of vector-space
+    representations. Yet while ‘multi-sense’ methods have been proposed and
+    tested on artificial wordsimilarity tasks, we don’t know if they improve
+    real natural language understanding tasks. In this paper we introduce a
+    multisense embedding model based on Chinese Restaurant Processes that
+    achieves state of the art performance on matching human word similarity
+    judgments, and propose a pipelined architecture for incorporating multi-
+    sense embeddings into language understanding. We then test the performance
+    of our model on part-of-speech tagging, named entity recognition,
+    sentiment analysis, semantic relation identification and semantic
+    relatedness, controlling for embedding dimensionality. We find that multi-
+    sense embeddings do improve performance on some tasks (part-of-speech
+    tagging, semantic relation identification, semantic relatedness) but not
+    on others (named entity recognition, various forms of sentiment analysis).
+    We discuss how these differences may be caused by the different role of
+    word sense information in each of the tasks. The results highlight the
+    importance of testing embedding models in real applications.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUERY 5: How can LSTM networks model long documents for text classification?
+════════════════════════════════════════════════════════════════════════════════
+
+  ── BM25 Result ──────────────────────────────────────────────
+  Title   : Multi-Timescale Long Short-Term Memory Neural Network for Modelling Sentences and Documents
+  Abstract:
+    Neural network based methods have obtained great progress on a variety of
+    natural language processing tasks. However, it is still a challenge task
+    to model long texts, such as sentences and documents. In this paper, we
+    propose a multi-timescale long short-termmemory (MT-LSTM) neural network
+    to model long texts. MTLSTM partitions the hidden states of the standard
+    LSTM into several groups. Each group is activated at different time
+    periods. Thus, MT-LSTM can model very long documents as well as short
+    sentences. Experiments on four benchmark datasets show that our model
+    outperforms the other neural models in text classification task.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+  ── Embedding (SPECTER2) Result ──────────────────────────────
+  Title   : Multi-Timescale Long Short-Term Memory Neural Network for Modelling Sentences and Documents
+  Score   : 0.8051
+  Abstract:
+    Neural network based methods have obtained great progress on a variety of
+    natural language processing tasks. However, it is still a challenge task
+    to model long texts, such as sentences and documents. In this paper, we
+    propose a multi-timescale long short-termmemory (MT-LSTM) neural network
+    to model long texts. MTLSTM partitions the hidden states of the standard
+    LSTM into several groups. Each group is activated at different time
+    periods. Thus, MT-LSTM can model very long documents as well as short
+    sentences. Experiments on four benchmark datasets show that our model
+    outperforms the other neural models in text classification task.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUERY 6: How is calibration of probabilistic NLP models evaluated?
+════════════════════════════════════════════════════════════════════════════════
+
+  ── BM25 Result ──────────────────────────────────────────────
+  Title   : Calibration of Pre-trained Transformers
+  Abstract:
+    Pre-trained Transformers are now ubiquitous in natural language
+    processing, but despite their high end-task performance, little is known
+    empirically about whether they are calibrated. Specifically, do these
+    models' posterior probabilities provide an accurate empirical measure of
+    how likely the model is to be correct on a given example? We focus on BERT
+    and RoBERTa in this work, and analyze their calibration across three
+    tasks: natural language inference, paraphrase detection, and commonsense
+    reasoning. For each task, we consider in-domain as well as challenging
+    out-of-domain settings, where models face more examples they should be
+    uncertain about. We show that: (1) when used out-of-the-box, pre-trained
+    models are calibrated in-domain, and compared to baselines, their
+    calibration error out-of-domain can be as much as 3.5x lower; (2)
+    temperature scaling is effective at further reducing calibration error in-
+    domain, and using label smoothing to deliberately increase empirical
+    uncertainty helps calibrate posteriors out-of-domain.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___0 ]
+
+  ── Embedding (SPECTER2) Result ──────────────────────────────
+  Title   : Posterior calibration and exploratory analysis for natural language processing models
+  Score   : 0.815
+  Abstract:
+    Many models in natural language processing define probabilistic
+    distributions over linguistic structures. We argue that (1) the quality of
+    a model' s posterior distribution can and should be directly evaluated, as
+    to whether probabilities correspond to empirical frequencies, and (2) NLP
+    uncertainty can be projected not only to pipeline components, but also to
+    exploratory data analysis, telling a user when to trust and not trust the
+    NLP analysis. We present a method to analyze calibration, and apply it to
+    compare the miscalibration of several commonly used models. We also
+    contribute a coreference sampling algorithm that can create confidence
+    intervals for a political event extraction task.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+
+════════════════════════════════════════════════════════════════════════════════
+QUERY 7: How do attention-based bidirectional LSTM networks perform on relation classification?
+════════════════════════════════════════════════════════════════════════════════
+
+  ── BM25 Result ──────────────────────────────────────────────
+  Title   : Bidirectional Recurrent Convolutional Neural Network for Relation Classification
+  Abstract:
+    Relation classification is an important semantic processing task in the
+    field of natural language processing (NLP). In this paper, we present a
+    novel model BRCNN to classify the relation of two entities in a sentence.
+    Some state-of-the-art systems concentrate on modeling the shortest
+    dependency path (SDP) between two entities leveraging convolutional or
+    recurrent neural networks. We further explore how to make full use of the
+    dependency relations information in the SDP, by combining convolutional
+    neural networks and twochannel recurrent neural networks with long short
+    term memory (LSTM) units. We propose a bidirectional architecture to learn
+    relation representations with directional information along the SDP
+    forwards and backwards at the same time, which benefits classifying the
+    direction of relations. Experimental results show that our method
+    outperforms the state-of-theart approaches on the SemEval-2010 Task 8
+    dataset.
+
+  [ Annotator 1 relevance: ___0 ]   [ Annotator 2 relevance: ___1 ]
+
+  ── Embedding (SPECTER2) Result ──────────────────────────────
+  Title   : Attention-Based Bidirectional Long Short-Term Memory Networks for Relation Classification
+  Score   : 0.7854
+  Abstract:
+    Relation classification is an important semantic processing task in the
+    field of natural language processing (NLP). State-ofthe-art systems still
+    rely on lexical resources such as WordNet or NLP systems like dependency
+    parser and named entity recognizers (NER) to get high-level features.
+    Another challenge is that important information can appear at any position
+    in the sentence. To tackle these problems, we propose Attention-Based
+    Bidirectional Long Short-Term Memory Networks(AttBLSTM) to capture the
+    most important semantic information in a sentence. The experimental
+    results on the SemEval-2010 relation classification task show that our
+    method outperforms most of the existing methods, with only word vectors.
+
+  [ Annotator 1 relevance: ___1 ]   [ Annotator 2 relevance: ___1 ]
+
+════════════════════════════════════════════════════════════════════════════════
+SCORING SUMMARY  —  fill in 1 (relevant) or 0 (not relevant)
+════════════════════════════════════════════════════════════════════════════════
+Query  BM25 A1    BM25 A2    Emb A1     Emb A2    
+----------------------------------------------
+Q1     0          0          1          1         
+Q2     1          1          1          1         
+Q3     1          1          1          1         
+Q4     1          1          1          1         
+Q5     1          1          1          1         
+Q6     1          0          1          1         
+Q7     0          1          1          1         
+
+Precision@1 per method = (sum of relevant marks) / number of queries
+  BM25 A1:  5/7 = 0.71
+  BM25 A2:  5/7 = 0.71
+  Emb  A1:  7/7 = 1.00
+  Emb  A2:  7/7 = 1.00
+
+Inter-annotator agreement: compare A1 vs A2 columns per method
+  BM25: agree on 5/7 queries (disagreement on Q6, Q7)
+  Emb:  agree on 7/7 queries
