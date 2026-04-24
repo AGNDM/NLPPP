@@ -67,14 +67,14 @@ def render_dense_rag(query: str) -> None:
         # Step 1: Query rewriting
         with st.status("Rewriting query..."):
             state.update(rewrite_query(state))
-            st.write(f"**Retrieval query:** {state['rewritten_query']}")
-            st.write(f"**Rewritten question:** {state['rewritten_user_question']}")
+            st.markdown(f"**Retrieval query:** {state['rewritten_query']}")
+            st.markdown(f"**Rewritten question:** {state['rewritten_user_question']}")
 
         # Step 2: Retrieval
         with st.status("Retrieving relevant papers..."):
             state.update(dense_retrieve(state))
             all_chunks = state["retrieved_chunks"]
-            st.write(f"Found **{len(all_chunks)}** papers above similarity threshold:")
+            st.markdown(f"Found **{len(all_chunks)}** papers above similarity threshold:")
             for i, chunk in enumerate(all_chunks):
                 title = chunk.payload.get("title", f"Paper {i + 1}")
                 abstract = chunk.payload.get("abstract", "")
@@ -89,7 +89,7 @@ def render_dense_rag(query: str) -> None:
             graded_titles = {c.payload.get("title") for c in graded_chunks}
             passed = len(graded_chunks)
             filtered = len(all_chunks) - passed
-            st.write(f"**{passed}** chunks passed · **{filtered}** filtered out")
+            st.markdown(f"**{passed}** chunks passed · **{filtered}** filtered out")
             for chunk in all_chunks:
                 title = chunk.payload.get("title", "Untitled")
                 if title in graded_titles:
