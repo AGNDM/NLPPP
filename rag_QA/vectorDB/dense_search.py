@@ -1,7 +1,18 @@
+"""
+dense.py
+--------
+Dense retrieval over the Qdrant vector index for the ablation study.
+
+Provides dense_search(), which embeds a query using SPECTER 2 and retrieves
+the top-k most similar paper chunks from Qdrant. Results are normalised into
+a flat dict structure shared with the BM25 retrieval module so that downstream
+saving and evaluation logic can treat both retrieval methods identically.
+
+The SPECTER 2 query model and Qdrant client are initialised once at import time.
+"""
+
 from __future__ import annotations
-
 from typing import Any
-
 from .helpers import load_query_model, embed_query, get_qdrant_client
 
 
@@ -19,6 +30,15 @@ def dense_search(query: str, top_k: int = DEFAULT_TOP_K) -> list[dict[str, Any]]
 
     Returns a normalized list of retrieved docs so downstream saving logic
     can be shared with BM25.
+
+    Args:
+        query:  The search query string.
+        top_k:  Number of results to return. Defaults to DEFAULT_TOP_K.
+
+    Returns:
+        List of dicts, each containing:
+            doc_id, title, abstract, text (title + abstract),
+            year, venue, and score (cosine similarity).
     """
     query_vector = embed_query(query, _query_tokenizer, _query_model).tolist()
 
